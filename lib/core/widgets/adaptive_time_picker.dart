@@ -10,10 +10,7 @@ Future<TimeOfDay?> showAdaptivePocketTimePicker({
   required TimeOfDay initialTime,
 }) async {
   if (!isCupertinoPlatform(Theme.of(context).platform)) {
-    return showTimePicker(
-      context: context,
-      initialTime: initialTime,
-    );
+    return showTimePicker(context: context, initialTime: initialTime);
   }
 
   var selected = initialTime;
@@ -81,7 +78,10 @@ Future<TimeOfDay?> showAdaptivePocketTimePicker({
                   use24hFormat: use24Hour,
                   initialDateTime: initialDate,
                   onDateTimeChanged: (value) {
-                    selected = TimeOfDay(hour: value.hour, minute: value.minute);
+                    selected = TimeOfDay(
+                      hour: value.hour,
+                      minute: value.minute,
+                    );
                   },
                 ),
               ),

@@ -47,6 +47,9 @@ The app also contains generated Flutter targets for web, linux, and windows, but
 - daily reminder notifications with graceful failure handling
 - adaptive Apple-style navigation and pickers where appropriate
 - dedicated About/Credits screen
+- editable reminder copy
+- local export and reset tools
+- generated App Store and Play Store metadata drafts
 
 ## Tech Stack
 
@@ -196,7 +199,7 @@ Current visual direction:
 
 ## Release Guidance
 
-Read [docs/RELEASE.md](/Users/tylerthompson/Developer/_flutter-appz/pocket_shift/docs/RELEASE.md) before preparing a store or production release build.
+Read [docs/RELEASE.md](/Users/tylerthompson/Developer/_flutter-appz/pocket_shift/docs/RELEASE.md) before preparing a store or production release build. Store listing drafts live in [store_metadata/generated/app_store_connect.md](/Users/tylerthompson/Developer/_flutter-appz/pocket_shift/store_metadata/generated/app_store_connect.md) and [store_metadata/generated/play_store.md](/Users/tylerthompson/Developer/_flutter-appz/pocket_shift/store_metadata/generated/play_store.md).
 
 ## Assets
 
@@ -219,8 +222,8 @@ Current automated coverage includes:
 ## Future Work
 
 Good next candidates for v2:
-- richer accessibility and dynamic type tuning across all custom layouts
-- more refined pocket visuals and motion polish
-- export/reset tools
-- reminder copy customization
-- release-mode app-store readiness checklist and metadata automation
+- optional encrypted export file support instead of clipboard-only export
+- richer reminder scheduling options beyond a single daily time
+- import/restore flow for local backups
+- deeper VoiceOver and TalkBack rotor actions
+- screenshot automation for store submissions

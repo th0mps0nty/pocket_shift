@@ -43,10 +43,13 @@ class SettingsScreen extends ConsumerWidget {
           ),
           data: (settings) => ListView(
             children: [
-              Text('Settings', style: Theme.of(context).textTheme.displayMedium),
+              Text(
+                'Settings',
+                style: Theme.of(context).textTheme.displayMedium,
+              ),
               const SizedBox(height: 8),
               Text(
-                'Make Pocket Shift feel like your pocket ritual.',
+                'Make Pocket Shift feel calm, familiar, and easy to return to.',
                 style: Theme.of(context).textTheme.bodyLarge,
               ),
               const SizedBox(height: 20),
@@ -58,9 +61,14 @@ class SettingsScreen extends ConsumerWidget {
               const SizedBox(height: 14),
               _ReminderCard(settings: settings),
               const SizedBox(height: 14),
-              _AboutCard(
-                onTap: () => context.push('/settings/about'),
+              _ReminderCopyCard(
+                settings: settings,
+                onTap: () => context.push('/settings/reminder-copy'),
               ),
+              const SizedBox(height: 14),
+              _DataToolsCard(onTap: () => context.push('/settings/data-tools')),
+              const SizedBox(height: 14),
+              _AboutCard(onTap: () => context.push('/settings/about')),
             ],
           ),
         ),
@@ -83,19 +91,35 @@ class _DailyCoinsCard extends ConsumerWidget {
           Text('Daily coins', style: Theme.of(context).textTheme.titleLarge),
           const SizedBox(height: 6),
           Text(
-            'Choose how many coins start in the left pocket each morning. New counts apply with your next fresh pocket.',
+            'Choose how many coins begin in the left pocket each morning. New counts apply with your next fresh pocket.',
             style: Theme.of(context).textTheme.bodyMedium,
           ),
           const SizedBox(height: 16),
           Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('${settings.dailyCoinCount}', style: Theme.of(context).textTheme.displayMedium),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 10,
+                ),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF4EBDD),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Text(
+                  '${settings.dailyCoinCount}',
+                  style: Theme.of(context).textTheme.headlineMedium,
+                ),
+              ),
               const SizedBox(width: 12),
               Expanded(
                 child: Slider(
                   min: AppConstants.minDailyCoinCount.toDouble(),
                   max: AppConstants.maxDailyCoinCount.toDouble(),
-                  divisions: AppConstants.maxDailyCoinCount - AppConstants.minDailyCoinCount,
+                  divisions:
+                      AppConstants.maxDailyCoinCount -
+                      AppConstants.minDailyCoinCount,
                   label: '${settings.dailyCoinCount}',
                   value: settings.dailyCoinCount.toDouble(),
                   onChanged: (value) {
@@ -127,7 +151,7 @@ class _CoinStyleCard extends ConsumerWidget {
           Text('Coin style', style: Theme.of(context).textTheme.titleLarge),
           const SizedBox(height: 6),
           Text(
-            'Start with classic pennies or swap in a different pocket-change feel.',
+            'Use the pocket change that feels right for you.',
             style: Theme.of(context).textTheme.bodyMedium,
           ),
           const SizedBox(height: 16),
@@ -156,7 +180,9 @@ class _CoinStyleCard extends ConsumerWidget {
               if (picked == null) {
                 return;
               }
-              await ref.read(settingsControllerProvider.notifier).setCoinStyle(picked);
+              await ref
+                  .read(settingsControllerProvider.notifier)
+                  .setCoinStyle(picked);
             },
           ),
         ],
@@ -181,15 +207,21 @@ class _PreferencesCard extends ConsumerWidget {
             subtitle: const Text('A small tap when you move or undo a coin.'),
             value: settings.hapticsEnabled,
             onChanged: (value) {
-              ref.read(settingsControllerProvider.notifier).setHapticsEnabled(value);
+              ref
+                  .read(settingsControllerProvider.notifier)
+                  .setHapticsEnabled(value);
             },
           ),
           SwitchListTile.adaptive(
             title: const Text('Sound'),
-            subtitle: const Text('A light coin landing sound when it drops into the pocket.'),
+            subtitle: const Text(
+              'A light pocket-change landing when the coin drops.',
+            ),
             value: settings.soundEnabled,
             onChanged: (value) {
-              ref.read(settingsControllerProvider.notifier).setSoundEnabled(value);
+              ref
+                  .read(settingsControllerProvider.notifier)
+                  .setSoundEnabled(value);
             },
           ),
         ],
@@ -249,12 +281,103 @@ class _ReminderCard extends ConsumerWidget {
                     if (picked == null) {
                       return;
                     }
-                    await ref.read(settingsControllerProvider.notifier).updateReminderTime(
+                    await ref
+                        .read(settingsControllerProvider.notifier)
+                        .updateReminderTime(
                           hour: picked.hour,
                           minute: picked.minute,
                         );
                   }
                 : null,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ReminderCopyCard extends StatelessWidget {
+  const _ReminderCopyCard({required this.settings, required this.onTap});
+
+  final AppSettings settings;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return SectionCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Reminder copy', style: Theme.of(context).textTheme.titleLarge),
+          const SizedBox(height: 8),
+          Text(
+            'Customize the words that show up in your daily nudge.',
+            style: Theme.of(context).textTheme.bodyMedium,
+          ),
+          const SizedBox(height: 14),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: const Color(0xFFF7F1E8),
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(color: const Color(0xFFE8DAC8)),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  settings.reminderTitle,
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  settings.reminderBody,
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 14),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: OutlinedButton.icon(
+              onPressed: onTap,
+              icon: const Icon(Icons.edit_outlined),
+              label: const Text('Edit reminder copy'),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _DataToolsCard extends StatelessWidget {
+  const _DataToolsCard({required this.onTap});
+
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return SectionCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Data tools', style: Theme.of(context).textTheme.titleLarge),
+          const SizedBox(height: 8),
+          Text(
+            'Export your local data or reset the app when you want a clean start.',
+            style: Theme.of(context).textTheme.bodyMedium,
+          ),
+          const SizedBox(height: 14),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: OutlinedButton.icon(
+              onPressed: onTap,
+              icon: const Icon(Icons.inventory_2_outlined),
+              label: const Text('Open data tools'),
+            ),
           ),
         ],
       ),
@@ -273,24 +396,23 @@ class _AboutCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('About & credits', style: Theme.of(context).textTheme.titleLarge),
+          Text(
+            'About & credits',
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
           const SizedBox(height: 8),
           Text(
             'Read the story behind Pocket Shift, the inspiration from counseling, and the full credit note.',
             style: Theme.of(context).textTheme.bodyMedium,
           ),
           const SizedBox(height: 14),
-          ListTile(
-            contentPadding: EdgeInsets.zero,
-            title: const Text('Open About Pocket Shift'),
-            subtitle: const Text('Story, purpose, and credits'),
-            trailing: const Icon(Icons.chevron_right_rounded),
-            onTap: onTap,
-          ),
-          const Divider(height: 18),
-          Text(
-            'Pocket Shift stores your sessions and settings on this device only. No account, no cloud sync, no hidden scorekeeping.',
-            style: Theme.of(context).textTheme.bodyMedium,
+          Align(
+            alignment: Alignment.centerLeft,
+            child: OutlinedButton.icon(
+              onPressed: onTap,
+              icon: const Icon(Icons.info_outline_rounded),
+              label: const Text('Open About'),
+            ),
           ),
         ],
       ),

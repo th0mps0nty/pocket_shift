@@ -19,17 +19,20 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   static const _pages = [
     _OnboardingPageData(
       title: 'A counseling exercise, made pocket-sized.',
-      body: 'Pocket Shift was inspired by a simple practice: start the day with coins in one pocket and move one whenever you catch a negative spiral.',
+      body:
+          'Pocket Shift was inspired by a simple practice: start the day with coins in one pocket and move one whenever you catch a negative spiral.',
       icon: Icons.favorite_border_rounded,
     ),
     _OnboardingPageData(
       title: 'This is about awareness, not punishment.',
-      body: 'One tap is enough. The goal is to notice the moment, pause, and make a little room for a kinder perspective.',
+      body:
+          'One tap is enough. The goal is to notice the moment, pause, and make a little room for a kinder perspective.',
       icon: Icons.visibility_outlined,
     ),
     _OnboardingPageData(
       title: 'Fresh pockets tomorrow.',
-      body: 'Your history stays local, gentle, and private. With gratitude to Brett Froggatt for sharing the original exercise that inspired this app.',
+      body:
+          'Your history stays local, gentle, and private. With gratitude to Brett Froggatt for sharing the original exercise that inspired this app.',
       icon: Icons.wb_sunny_outlined,
     ),
   ];
@@ -53,10 +56,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                TextButton(
-                  onPressed: _finish,
-                  child: const Text('Skip'),
-                ),
+                TextButton(onPressed: _finish, child: const Text('Skip')),
               ],
             ),
             Expanded(

@@ -1,0 +1,48 @@
+{
+  "appName": "Pocket Shift",
+  "tagline": "A gentle pocket ritual for noticing negative loops before they steer the day.",
+  "coreValue": "Pocket Shift turns a simple counseling exercise into a calm daily ritual for awareness, perspective, and emotional reset.",
+  "audience": "Adults, parents, couples, and anyone building awareness around negative thought patterns.",
+  "features": [
+    "One-tap coin flip from left pocket to right pocket",
+    "Daily reset with a fresh pocket each morning",
+    "Undo for the most recent move",
+    "Local-only history and settings",
+    "Custom reminders, sounds, haptics, and coin styles",
+    "Supportive onboarding and about story"
+  ],
+  "keywords": [
+    "mindfulness",
+    "awareness",
+    "habit",
+    "reflection",
+    "mental wellness",
+    "family",
+    "counseling",
+    "positivity",
+    "journal",
+    "routine"
+  ],
+  "apple": {
+    "subtitle": "Notice small shifts",
+    "promotionalText": "A calm, tactile micro-habit for catching negativity early and making room for a gentler response.",
+    "category": "Health & Fitness",
+    "secondaryCategory": "Lifestyle"
+  },
+  "google": {
+    "shortDescription": "A gentle daily coin ritual for noticing negative thought patterns.",
+    "category": "Health & Fitness"
+  },
+  "credits": {
+    "attribution": "Inspired by a counseling exercise shared by Brett Froggatt of Second Chance Columbus.",
+    "contact": "brett@secondchancecolumbus.com"
+  },
+  "privacy": {
+    "summary": "Pocket Shift stores sessions and settings locally on device. No account, analytics SDK, or cloud sync is included in this build."
+  },
+  "releaseNotes": [
+    "Introduces Pocket Shift, a gentle pocket-based awareness ritual.",
+    "Includes onboarding, history, reminder customization, sound, and local-only persistence.",
+    "Adds denim-inspired visuals, adaptive Apple-style navigation, and accessible one-tap tracking."
+  ]
+}

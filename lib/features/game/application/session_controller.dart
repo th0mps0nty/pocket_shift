@@ -8,8 +8,8 @@ import '../domain/daily_session.dart';
 
 final sessionControllerProvider =
     AsyncNotifierProvider<SessionController, DailySession>(
-  SessionController.new,
-);
+      SessionController.new,
+    );
 
 class SessionController extends AsyncNotifier<DailySession> {
   @override

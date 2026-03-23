@@ -18,7 +18,8 @@ class CoinMove {
   }
 
   factory CoinMove.fromJson(Map<String, dynamic> json) {
-    final directionName = json['direction'] as String? ?? CoinDirection.leftToRight.name;
+    final directionName =
+        json['direction'] as String? ?? CoinDirection.leftToRight.name;
 
     return CoinMove(
       timestamp: DateTime.parse(json['timestamp'] as String),
@@ -31,7 +32,4 @@ class CoinMove {
   }
 }
 
-enum CoinDirection {
-  leftToRight,
-  rightToLeft,
-}
+enum CoinDirection { leftToRight, rightToLeft }

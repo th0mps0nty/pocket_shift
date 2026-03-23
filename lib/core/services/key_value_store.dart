@@ -11,7 +11,7 @@ abstract class KeyValueStore {
 
 class SharedPreferencesKeyValueStore implements KeyValueStore {
   SharedPreferencesKeyValueStore([SharedPreferencesAsync? preferences])
-      : _preferences = preferences ?? SharedPreferencesAsync();
+    : _preferences = preferences ?? SharedPreferencesAsync();
 
   final SharedPreferencesAsync _preferences;
 

@@ -10,28 +10,37 @@ import 'package:pocket_shift/features/settings/domain/app_settings.dart';
 import '../../../helpers/in_memory_key_value_store.dart';
 
 void main() {
-  test('session controller can be invalidated and rebuilt without throwing', () async {
-    final store = InMemoryKeyValueStore();
-    final container = ProviderContainer(
-      overrides: [
-        keyValueStoreProvider.overrideWithValue(store),
-        clockProvider.overrideWithValue(() => DateTime(2026, 3, 23, 9)),
-        notificationServiceProvider.overrideWithValue(_FakeNotificationService()),
-      ],
-    );
-    addTearDown(container.dispose);
+  test(
+    'session controller can be invalidated and rebuilt without throwing',
+    () async {
+      final store = InMemoryKeyValueStore();
+      final container = ProviderContainer(
+        overrides: [
+          keyValueStoreProvider.overrideWithValue(store),
+          clockProvider.overrideWithValue(() => DateTime(2026, 3, 23, 9)),
+          notificationServiceProvider.overrideWithValue(
+            _FakeNotificationService(),
+          ),
+        ],
+      );
+      addTearDown(container.dispose);
 
-    final firstSession = await container.read(sessionControllerProvider.future);
+      final firstSession = await container.read(
+        sessionControllerProvider.future,
+      );
 
-    container.invalidate(settingsControllerProvider);
-    container.invalidate(sessionControllerProvider);
+      container.invalidate(settingsControllerProvider);
+      container.invalidate(sessionControllerProvider);
 
-    final secondSession = await container.read(sessionControllerProvider.future);
+      final secondSession = await container.read(
+        sessionControllerProvider.future,
+      );
 
-    expect(firstSession.date, '2026-03-23');
-    expect(secondSession.date, '2026-03-23');
-    expect(secondSession.startingCoins, firstSession.startingCoins);
-  });
+      expect(firstSession.date, '2026-03-23');
+      expect(secondSession.date, '2026-03-23');
+      expect(secondSession.startingCoins, firstSession.startingCoins);
+    },
+  );
 }
 
 class _FakeNotificationService extends NotificationService {

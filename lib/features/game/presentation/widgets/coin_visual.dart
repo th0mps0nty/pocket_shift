@@ -28,7 +28,10 @@ class CoinVisual extends StatelessWidget {
             end: Alignment.bottomRight,
             colors: style.gradientColors,
           ),
-          border: Border.all(color: style.rimColor.withValues(alpha: 0.9), width: size * 0.08),
+          border: Border.all(
+            color: style.rimColor.withValues(alpha: 0.9),
+            width: size * 0.08,
+          ),
           boxShadow: [
             BoxShadow(
               blurRadius: size * 0.28,

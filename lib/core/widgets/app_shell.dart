@@ -5,10 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../utils/platform_utils.dart';
 
 class AppShell extends StatelessWidget {
-  const AppShell({
-    super.key,
-    required this.navigationShell,
-  });
+  const AppShell({super.key, required this.navigationShell});
 
   final StatefulNavigationShell navigationShell;
 

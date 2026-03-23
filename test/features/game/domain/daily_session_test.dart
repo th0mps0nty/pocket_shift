@@ -20,7 +20,9 @@ void main() {
           .moveOne(now: now.add(const Duration(minutes: 1)))
           .moveOne(now: now.add(const Duration(minutes: 2)));
 
-      final updated = session.undoLastMove(now: now.add(const Duration(minutes: 3)));
+      final updated = session.undoLastMove(
+        now: now.add(const Duration(minutes: 3)),
+      );
 
       expect(updated, isNotNull);
       expect(updated!.movedCoins, 1);

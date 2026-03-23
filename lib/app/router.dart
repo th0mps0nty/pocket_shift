@@ -14,10 +14,14 @@ import '../features/onboarding/application/onboarding_controller.dart';
 import '../features/onboarding/presentation/onboarding_screen.dart';
 import '../features/settings/application/settings_controller.dart';
 import '../features/settings/presentation/about_screen.dart';
+import '../features/settings/presentation/data_tools_screen.dart';
+import '../features/settings/presentation/reminder_copy_screen.dart';
 import '../features/settings/presentation/settings_screen.dart';
 
 final appStartupProvider = FutureProvider<bool>((ref) async {
-  final onboardingComplete = await ref.read(onboardingControllerProvider.future);
+  final onboardingComplete = await ref.read(
+    onboardingControllerProvider.future,
+  );
   await ref.read(settingsControllerProvider.future);
   await ref.read(sessionControllerProvider.future);
   return onboardingComplete;
@@ -87,6 +91,22 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                       context: context,
                       state: state,
                       child: const AboutScreen(),
+                    ),
+                  ),
+                  GoRoute(
+                    path: 'reminder-copy',
+                    pageBuilder: (context, state) => _buildAdaptivePage(
+                      context: context,
+                      state: state,
+                      child: const ReminderCopyScreen(),
+                    ),
+                  ),
+                  GoRoute(
+                    path: 'data-tools',
+                    pageBuilder: (context, state) => _buildAdaptivePage(
+                      context: context,
+                      state: state,
+                      child: const DataToolsScreen(),
                     ),
                   ),
                 ],
@@ -181,9 +201,5 @@ Page<void> _buildAdaptivePage({
     );
   }
 
-  return MaterialPage<void>(
-    key: state.pageKey,
-    name: state.name,
-    child: child,
-  );
+  return MaterialPage<void>(key: state.pageKey, name: state.name, child: child);
 }

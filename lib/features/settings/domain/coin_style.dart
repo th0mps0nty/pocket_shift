@@ -1,11 +1,6 @@
 import 'package:flutter/material.dart';
 
-enum CoinStyle {
-  penny,
-  nickel,
-  dime,
-  quarter,
-}
+enum CoinStyle { penny, nickel, dime, quarter }
 
 extension CoinStyleX on CoinStyle {
   String get storageValue => name;

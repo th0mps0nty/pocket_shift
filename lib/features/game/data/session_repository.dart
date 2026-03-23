@@ -79,7 +79,10 @@ class SessionRepository {
 
   Future<void> archiveSession(DailySession session) async {
     final history = await loadHistory();
-    final updated = [session, ...history.where((item) => item.id != session.id)];
+    final updated = [
+      session,
+      ...history.where((item) => item.id != session.id),
+    ];
 
     await _store.setString(
       AppConstants.historyKey,

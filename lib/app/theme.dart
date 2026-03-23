@@ -9,17 +9,18 @@ ThemeData buildAppTheme() {
   const gold = Color(0xFFD8A64F);
   const coral = Color(0xFFE7C4AF);
 
-  final colorScheme = ColorScheme.fromSeed(
-    seedColor: teal,
-    brightness: Brightness.light,
-    surface: sand,
-  ).copyWith(
-    primary: teal,
-    secondary: gold,
-    tertiary: coral,
-    surface: sand,
-    onSurface: ink,
-  );
+  final colorScheme =
+      ColorScheme.fromSeed(
+        seedColor: teal,
+        brightness: Brightness.light,
+        surface: sand,
+      ).copyWith(
+        primary: teal,
+        secondary: gold,
+        tertiary: coral,
+        surface: sand,
+        onSurface: ink,
+      );
 
   final baseTextTheme = const TextTheme(
     displayLarge: TextStyle(

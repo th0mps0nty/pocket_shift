@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/constants/app_constants.dart';
 import '../../../core/services/notification_service.dart';
 import '../data/settings_repository.dart';
 import '../domain/app_settings.dart';
@@ -7,8 +8,8 @@ import '../domain/coin_style.dart';
 
 final settingsControllerProvider =
     AsyncNotifierProvider<SettingsController, AppSettings>(
-  SettingsController.new,
-);
+      SettingsController.new,
+    );
 
 class SettingsController extends AsyncNotifier<AppSettings> {
   @override
@@ -46,14 +47,31 @@ class SettingsController extends AsyncNotifier<AppSettings> {
     required int minute,
   }) async {
     await _persist(
+      (current) => current.copyWith(reminderHour: hour, reminderMinute: minute),
+    );
+  }
+
+  Future<void> updateReminderCopy({
+    required String title,
+    required String body,
+  }) async {
+    await _persist(
+      (current) => current.copyWith(reminderTitle: title, reminderBody: body),
+    );
+  }
+
+  Future<void> resetReminderCopy() async {
+    await _persist(
       (current) => current.copyWith(
-        reminderHour: hour,
-        reminderMinute: minute,
+        reminderTitle: AppConstants.defaultReminderTitle,
+        reminderBody: AppConstants.defaultReminderBody,
       ),
     );
   }
 
-  Future<void> _persist(AppSettings Function(AppSettings current) update) async {
+  Future<void> _persist(
+    AppSettings Function(AppSettings current) update,
+  ) async {
     final repository = ref.read(settingsRepositoryProvider);
     final notificationService = ref.read(notificationServiceProvider);
     final current = state.valueOrNull ?? await future;

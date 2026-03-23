@@ -25,7 +25,10 @@ class HistoryScreen extends ConsumerWidget {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text('History needs a quick reload.', style: Theme.of(context).textTheme.titleLarge),
+                  Text(
+                    'History needs a quick reload.',
+                    style: Theme.of(context).textTheme.titleLarge,
+                  ),
                   const SizedBox(height: 16),
                   FilledButton(
                     onPressed: () => ref.invalidate(historyTimelineProvider),
@@ -44,10 +47,12 @@ class HistoryScreen extends ConsumerWidget {
                 style: Theme.of(context).textTheme.bodyLarge,
               ),
               const SizedBox(height: 20),
-              ...items.map((item) => Padding(
-                    padding: const EdgeInsets.only(bottom: 14),
-                    child: _HistoryCard(item: item),
-                  )),
+              ...items.map(
+                (item) => Padding(
+                  padding: const EdgeInsets.only(bottom: 14),
+                  child: _HistoryCard(item: item),
+                ),
+              ),
             ],
           ),
         ),
@@ -74,7 +79,9 @@ class _HistoryCard extends StatelessWidget {
             children: [
               Expanded(
                 child: Text(
-                  item.isCurrent ? 'Today' : PocketShiftDateUtils.formatSessionDate(session.date),
+                  item.isCurrent
+                      ? 'Today'
+                      : PocketShiftDateUtils.formatSessionDate(session.date),
                   style: theme.textTheme.titleLarge,
                 ),
               ),
@@ -86,7 +93,10 @@ class _HistoryCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(999),
                 ),
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
                   child: Text(
                     item.isCurrent ? 'In progress' : 'Closed',
                     style: theme.textTheme.bodyMedium?.copyWith(

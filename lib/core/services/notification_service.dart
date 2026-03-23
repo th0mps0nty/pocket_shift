@@ -13,7 +13,7 @@ final notificationServiceProvider = Provider<NotificationService>(
 
 class NotificationService {
   NotificationService({FlutterLocalNotificationsPlugin? plugin})
-      : _plugin = plugin ?? FlutterLocalNotificationsPlugin();
+    : _plugin = plugin ?? FlutterLocalNotificationsPlugin();
 
   final FlutterLocalNotificationsPlugin _plugin;
   bool _initialized = false;
@@ -83,8 +83,8 @@ class NotificationService {
 
       await _plugin.zonedSchedule(
         AppConstants.reminderNotificationId,
-        'Pocket Shift',
-        'Pause for a breath and notice what pocket today is in.',
+        settings.reminderTitle,
+        settings.reminderBody,
         scheduledDate,
         details,
         androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
@@ -120,14 +120,21 @@ class NotificationService {
 
   Future<bool> _requestPermissions() async {
     try {
-      final androidPlugin = _plugin.resolvePlatformSpecificImplementation<
-          AndroidFlutterLocalNotificationsPlugin>();
-      final iosPlugin = _plugin.resolvePlatformSpecificImplementation<
-          IOSFlutterLocalNotificationsPlugin>();
-      final macPlugin = _plugin.resolvePlatformSpecificImplementation<
-          MacOSFlutterLocalNotificationsPlugin>();
+      final androidPlugin = _plugin
+          .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin
+          >();
+      final iosPlugin = _plugin
+          .resolvePlatformSpecificImplementation<
+            IOSFlutterLocalNotificationsPlugin
+          >();
+      final macPlugin = _plugin
+          .resolvePlatformSpecificImplementation<
+            MacOSFlutterLocalNotificationsPlugin
+          >();
 
-      final androidGranted = await androidPlugin?.requestNotificationsPermission();
+      final androidGranted = await androidPlugin
+          ?.requestNotificationsPermission();
       final iosGranted = await iosPlugin?.requestPermissions(
         alert: true,
         badge: false,
@@ -139,9 +146,11 @@ class NotificationService {
         sound: true,
       );
 
-      return [androidGranted, iosGranted, macGranted]
-          .whereType<bool>()
-          .fold<bool>(true, (value, next) => value && next);
+      return [
+        androidGranted,
+        iosGranted,
+        macGranted,
+      ].whereType<bool>().fold<bool>(true, (value, next) => value && next);
     } catch (_) {
       return false;
     }

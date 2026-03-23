@@ -14,6 +14,8 @@ class PrimaryCoinButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+
     return Semantics(
       button: true,
       enabled: enabled,
@@ -22,25 +24,62 @@ class PrimaryCoinButton extends StatelessWidget {
           : 'No coins remain to move today',
       child: SizedBox(
         width: double.infinity,
-        child: FilledButton.icon(
+        child: FilledButton(
           onPressed: enabled ? onPressed : null,
-          icon: const Icon(Icons.swipe_right_alt_rounded, size: 30),
-          label: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 4),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('Flip one $coinLabel'),
-                Text(
-                  enabled ? 'You noticed it. That counts.' : 'Fresh pockets tomorrow.',
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Colors.white.withValues(alpha: 0.84),
+          style: FilledButton.styleFrom(
+            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
+            minimumSize: const Size.fromHeight(92),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(28),
+            ),
+            backgroundColor: const Color(0xFF467A73),
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 54,
+                height: 54,
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.16),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.sync_alt_rounded,
+                  color: Colors.white,
+                  size: 28,
+                ),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Flip one $coinLabel',
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: textTheme.titleLarge?.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      enabled
+                          ? 'You noticed it. That counts.'
+                          : 'Fresh pockets tomorrow.',
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: textTheme.bodyLarge?.copyWith(
+                        color: Colors.white.withValues(alpha: 0.86),
                         fontWeight: FontWeight.w600,
                       ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),

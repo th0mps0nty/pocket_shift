@@ -12,7 +12,10 @@ class AboutScreen extends StatelessWidget {
       title: 'About Pocket Shift',
       child: ListView(
         children: [
-          Text('About Pocket Shift', style: Theme.of(context).textTheme.displayMedium),
+          Text(
+            'About Pocket Shift',
+            style: Theme.of(context).textTheme.displayMedium,
+          ),
           const SizedBox(height: 8),
           Text(
             'Pocket Shift turns a simple counseling exercise into a gentle daily ritual for noticing negative thought patterns and creating space for a more grounded response.',

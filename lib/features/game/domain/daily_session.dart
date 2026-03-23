@@ -99,10 +99,7 @@ class DailySession {
   }
 
   DailySession close({required DateTime now}) {
-    return copyWith(
-      updatedAt: now,
-      endedAt: endedAt ?? now,
-    );
+    return copyWith(updatedAt: now, endedAt: endedAt ?? now);
   }
 
   Map<String, dynamic> toJson() {

@@ -11,6 +11,7 @@ class PocketCard extends StatelessWidget {
     required this.helper,
     required this.coinStyle,
     required this.side,
+    this.compact = false,
   });
 
   final String label;
@@ -18,24 +19,34 @@ class PocketCard extends StatelessWidget {
   final String helper;
   final CoinStyle coinStyle;
   final PocketSide side;
+  final bool compact;
 
   @override
   Widget build(BuildContext context) {
     final isLeft = side == PocketSide.left;
+    final theme = Theme.of(context);
 
     return Semantics(
       label: '$label has $count ${coinStyle.label.toLowerCase()} coins',
+      value: helper,
       child: Container(
-        padding: const EdgeInsets.fromLTRB(16, 16, 16, 18),
+        constraints: BoxConstraints(minHeight: compact ? 246 : 286),
+        padding: EdgeInsets.fromLTRB(16, compact ? 18 : 20, 16, 18),
         decoration: BoxDecoration(
-          gradient: const LinearGradient(
+          gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [
-              Color(0xFF436B99),
-              Color(0xFF284D78),
-              Color(0xFF1A3454),
-            ],
+            colors: isLeft
+                ? const [
+                    Color(0xFF4671A2),
+                    Color(0xFF274C76),
+                    Color(0xFF1A3658),
+                  ]
+                : const [
+                    Color(0xFF3F6897),
+                    Color(0xFF23466E),
+                    Color(0xFF17304E),
+                  ],
           ),
           borderRadius: BorderRadius.only(
             topLeft: Radius.circular(isLeft ? 34 : 24),
@@ -44,24 +55,23 @@ class PocketCard extends StatelessWidget {
             bottomRight: const Radius.circular(34),
           ),
           border: Border.all(
-            color: const Color(0xFF8CB2D6).withValues(alpha: 0.26),
+            color: const Color(0xFF8CB2D6).withValues(alpha: 0.24),
           ),
           boxShadow: const [
             BoxShadow(
-              blurRadius: 20,
-              offset: Offset(0, 14),
-              color: Color(0x26122A46),
+              blurRadius: 26,
+              offset: Offset(0, 16),
+              color: Color(0x24112541),
             ),
           ],
         ),
         child: Stack(
           children: [
             Positioned.fill(
-              child: CustomPaint(
-                painter: _PocketPainter(side: side),
-              ),
+              child: CustomPaint(painter: _PocketPainter(side: side)),
             ),
             Column(
+              mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
@@ -69,68 +79,97 @@ class PocketCard extends StatelessWidget {
                   children: [
                     Expanded(
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 8,
+                        ),
                         decoration: BoxDecoration(
                           color: Colors.white.withValues(alpha: 0.14),
                           borderRadius: BorderRadius.circular(999),
+                          border: Border.all(
+                            color: Colors.white.withValues(alpha: 0.08),
+                          ),
                         ),
                         child: Text(
                           label,
-                          maxLines: 1,
+                          maxLines: 2,
                           overflow: TextOverflow.ellipsis,
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w800,
-                              ),
+                          style: theme.textTheme.bodyLarge?.copyWith(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w800,
+                          ),
                         ),
                       ),
                     ),
                     const SizedBox(width: 12),
-                    Text(
-                      '$count',
-                      style: Theme.of(context).textTheme.displayMedium?.copyWith(
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text(
+                          '$count',
+                          style: theme.textTheme.displayMedium?.copyWith(
                             color: Colors.white,
                             fontWeight: FontWeight.w900,
-                            height: 0.95,
+                            height: 0.92,
                           ),
+                        ),
+                        Text(
+                          'coins',
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: Colors.white.withValues(alpha: 0.76),
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
-                const SizedBox(height: 18),
+                SizedBox(height: compact ? 16 : 18),
                 Container(
-                  height: 82,
                   width: double.infinity,
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                  padding: const EdgeInsets.fromLTRB(12, 14, 12, 12),
                   decoration: BoxDecoration(
                     color: Colors.white.withValues(alpha: 0.08),
-                    borderRadius: BorderRadius.circular(24),
+                    borderRadius: BorderRadius.circular(26),
                     border: Border.all(
                       color: Colors.white.withValues(alpha: 0.08),
                     ),
                   ),
-                  child: Align(
-                    alignment: Alignment.topLeft,
-                    child: Wrap(
-                      spacing: 6,
-                      runSpacing: 6,
-                      children: List.generate(
-                        count,
-                        (index) => CoinVisual(
-                          style: coinStyle,
-                          size: 18,
-                          semanticLabel: null,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        isLeft
+                            ? 'Pocket change still with you'
+                            : 'Pocket change already noticed',
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: Colors.white.withValues(alpha: 0.78),
+                          fontWeight: FontWeight.w700,
                         ),
                       ),
-                    ),
+                      const SizedBox(height: 10),
+                      Wrap(
+                        spacing: 6,
+                        runSpacing: 6,
+                        children: List.generate(
+                          count,
+                          (index) => CoinVisual(
+                            style: coinStyle,
+                            size: compact ? 18 : 20,
+                            semanticLabel: null,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                const Spacer(),
+                SizedBox(height: compact ? 16 : 20),
                 Text(
                   helper,
-                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        color: Colors.white.withValues(alpha: 0.86),
-                        height: 1.28,
-                      ),
+                  style: theme.textTheme.bodyLarge?.copyWith(
+                    color: Colors.white.withValues(alpha: 0.88),
+                    height: 1.28,
+                  ),
                 ),
               ],
             ),
@@ -151,46 +190,45 @@ class _PocketPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final weavePaint = Paint()
-      ..color = Colors.white.withValues(alpha: 0.03)
+      ..color = Colors.white.withValues(alpha: 0.028)
       ..strokeWidth = 1;
-    for (var x = -24.0; x < size.width + 24; x += 18) {
-      canvas.drawLine(Offset(x, 0), Offset(x + 12, size.height), weavePaint);
-      canvas.drawLine(Offset(x + 10, 0), Offset(x - 2, size.height), weavePaint);
+    for (var x = -24.0; x < size.width + 24; x += 20) {
+      canvas.drawLine(Offset(x, 0), Offset(x + 16, size.height), weavePaint);
+      canvas.drawLine(
+        Offset(x + 12, 0),
+        Offset(x - 4, size.height),
+        weavePaint,
+      );
     }
 
-    final fadePaint = Paint()
+    final topFade = Paint()
       ..shader = const LinearGradient(
         begin: Alignment.topCenter,
         end: Alignment.bottomCenter,
-        colors: [Color(0x22FFFFFF), Color(0x00000000)],
+        colors: [Color(0x26FFFFFF), Color(0x00000000)],
       ).createShader(Offset.zero & size);
     canvas.drawRRect(
-      RRect.fromRectAndRadius(Offset.zero & size, const Radius.circular(28)),
-      fadePaint,
+      RRect.fromRectAndRadius(Offset.zero & size, const Radius.circular(30)),
+      topFade,
     );
 
+    final hemPaint = Paint()
+      ..color = const Color(0xFF6D97C1).withValues(alpha: 0.34)
+      ..strokeWidth = 2.2
+      ..style = PaintingStyle.stroke;
+
+    final hemPath = Path()
+      ..moveTo(24, 62)
+      ..quadraticBezierTo(size.width * 0.3, 22, size.width * 0.5, 36)
+      ..quadraticBezierTo(size.width * 0.7, 22, size.width - 24, 62);
+    canvas.drawPath(hemPath, hemPaint);
+
     final stitchPaint = Paint()
-      ..color = const Color(0xFFF3D4A5).withValues(alpha: 0.9)
-      ..strokeWidth = 2.4
+      ..color = const Color(0xFFF2D0A0).withValues(alpha: 0.94)
+      ..strokeWidth = 2.6
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round;
-
-    final rimPath = Path()
-      ..moveTo(26, 58)
-      ..quadraticBezierTo(
-        size.width * (side == PocketSide.left ? 0.28 : 0.22),
-        28,
-        size.width * 0.5,
-        40,
-      )
-      ..quadraticBezierTo(
-        size.width * (side == PocketSide.left ? 0.78 : 0.72),
-        28,
-        size.width - 26,
-        58,
-      );
-
-    for (final metric in rimPath.computeMetrics()) {
+    for (final metric in hemPath.computeMetrics()) {
       var distance = 0.0;
       while (distance < metric.length) {
         final next = (distance + 10).clamp(0.0, metric.length).toDouble();
@@ -199,22 +237,27 @@ class _PocketPainter extends CustomPainter {
       }
     }
 
-    final sidePaint = Paint()
+    final seamPaint = Paint()
       ..color = Colors.white.withValues(alpha: 0.08)
-      ..strokeWidth = 1.5
+      ..strokeWidth = 1.8
       ..style = PaintingStyle.stroke;
-    final leftInset = side == PocketSide.left ? 16.0 : 22.0;
-    final rightInset = side == PocketSide.left ? 22.0 : 16.0;
+    final leftInset = side == PocketSide.left ? 16.0 : 20.0;
+    final rightInset = side == PocketSide.left ? 20.0 : 16.0;
     canvas.drawLine(
-      Offset(leftInset, 74),
-      Offset(leftInset, size.height - 28),
-      sidePaint,
+      Offset(leftInset, 84),
+      Offset(leftInset, size.height - 26),
+      seamPaint,
     );
     canvas.drawLine(
-      Offset(size.width - rightInset, 74),
-      Offset(size.width - rightInset, size.height - 28),
-      sidePaint,
+      Offset(size.width - rightInset, 84),
+      Offset(size.width - rightInset, size.height - 26),
+      seamPaint,
     );
+
+    final rivetPaint = Paint()
+      ..color = const Color(0xFFE7C48C).withValues(alpha: 0.85);
+    canvas.drawCircle(Offset(28, 70), 3.6, rivetPaint);
+    canvas.drawCircle(Offset(size.width - 28, 70), 3.6, rivetPaint);
   }
 
   @override

@@ -3,9 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../data/onboarding_repository.dart';
 
 final onboardingControllerProvider =
-    AsyncNotifierProvider<OnboardingController, bool>(
-  OnboardingController.new,
-);
+    AsyncNotifierProvider<OnboardingController, bool>(OnboardingController.new);
 
 class OnboardingController extends AsyncNotifier<bool> {
   late final OnboardingRepository _repository;

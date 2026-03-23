@@ -17,18 +17,11 @@ class SoftBackground extends StatelessWidget {
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [
-            Color(0xFFF9F3E7),
-            Color(0xFFE9F0E8),
-            Color(0xFFF5EDE4),
-          ],
+          colors: [Color(0xFFF9F3E7), Color(0xFFE9F0E8), Color(0xFFF5EDE4)],
         ),
       ),
       child: SafeArea(
-        child: Padding(
-          padding: padding,
-          child: child,
-        ),
+        child: Padding(padding: padding, child: child),
       ),
     );
   }

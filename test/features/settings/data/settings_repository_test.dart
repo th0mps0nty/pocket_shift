@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:pocket_shift/core/constants/app_constants.dart';
 import 'package:pocket_shift/features/settings/data/settings_repository.dart';
 import 'package:pocket_shift/features/settings/domain/app_settings.dart';
 import 'package:pocket_shift/features/settings/domain/coin_style.dart';
@@ -15,6 +16,8 @@ void main() {
         remindersEnabled: true,
         reminderHour: 19,
         reminderMinute: 45,
+        reminderTitle: 'Pause and notice',
+        reminderBody: 'Take a breath and check which pocket the day is in.',
         coinStyle: CoinStyle.quarter,
       );
 
@@ -22,6 +25,26 @@ void main() {
 
       expect(roundTrip, settings);
     });
+
+    test(
+      'falls back to default reminder copy when blank values are provided',
+      () {
+        final settings = AppSettings.fromJson(const {
+          'dailyCoinCount': 10,
+          'hapticsEnabled': true,
+          'soundEnabled': true,
+          'remindersEnabled': true,
+          'reminderHour': 8,
+          'reminderMinute': 0,
+          'reminderTitle': '   ',
+          'reminderBody': '',
+          'coinStyle': 'penny',
+        });
+
+        expect(settings.reminderTitle, AppConstants.defaultReminderTitle);
+        expect(settings.reminderBody, AppConstants.defaultReminderBody);
+      },
+    );
   });
 
   group('SettingsRepository', () {
@@ -34,6 +57,8 @@ void main() {
         remindersEnabled: true,
         reminderHour: 21,
         reminderMinute: 15,
+        reminderTitle: 'Pocket check',
+        reminderBody: 'Pause for one breath and notice the day.',
         coinStyle: CoinStyle.dime,
       );
 
