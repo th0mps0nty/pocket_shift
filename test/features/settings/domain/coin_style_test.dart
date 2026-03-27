@@ -43,7 +43,7 @@ void main() {
 
       test('all gradient pairs are distinct', () {
         final pairs = CoinStyle.values.map((s) => s.gradientColors).toList();
-        final unique = {for (final p in pairs) '${p[0].value}-${p[1].value}'};
+        final unique = {for (final p in pairs) '${p[0].toARGB32()}-${p[1].toARGB32()}'};
         expect(unique.length, CoinStyle.values.length);
       });
     });
@@ -56,7 +56,7 @@ void main() {
       });
 
       test('penny rim color matches expected value', () {
-        expect(CoinStyle.penny.rimColor.value, 0xFFF0C3A3);
+        expect(CoinStyle.penny.rimColor.toARGB32(), 0xFFF0C3A3);
       });
     });
 

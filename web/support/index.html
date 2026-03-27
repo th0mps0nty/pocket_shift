@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta
+    name="description"
+    content="Pocket Shift support, troubleshooting, privacy details, and help for reminders, history, sound, and local data."
+  >
+  <title>Pocket Shift Support</title>
+  <link rel="canonical" href="https://pocketshift.app/support/">
+  <link rel="icon" type="image/png" href="/favicon.png">
+  <style>
+    :root {
+      --sand: #f5eddc;
+      --sand-deep: #e6d8bc;
+      --ink: #183153;
+      --ink-soft: #4b5f79;
+      --denim: #244a73;
+      --denim-deep: #193756;
+      --card: rgba(255, 255, 255, 0.82);
+      --line: rgba(24, 49, 83, 0.12);
+      --shadow: rgba(17, 35, 56, 0.16);
+      --accent: #d89a3d;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      min-height: 100%;
+      background:
+        radial-gradient(circle at top left, rgba(255, 255, 255, 0.75), transparent 34%),
+        radial-gradient(circle at bottom right, rgba(216, 154, 61, 0.18), transparent 28%),
+        linear-gradient(180deg, var(--sand), #efe3ca 68%, var(--sand-deep));
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      font-family:
+        Manrope,
+        ui-sans-serif,
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+      line-height: 1.55;
+    }
+
+    a {
+      color: var(--denim-deep);
+    }
+
+    .wrap {
+      width: min(100%, 980px);
+      margin: 0 auto;
+      padding: 32px 20px 56px;
+    }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      padding: 32px;
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      border-radius: 34px;
+      background:
+        linear-gradient(135deg, rgba(36, 74, 115, 0.96), rgba(25, 55, 86, 0.98)),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.05), transparent);
+      color: #f8fbff;
+      box-shadow: 0 24px 60px var(--shadow);
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      right: -70px;
+      top: -60px;
+      width: 220px;
+      height: 220px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(216, 154, 61, 0.42), rgba(216, 154, 61, 0));
+      pointer-events: none;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 14px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.12);
+      color: rgba(248, 251, 255, 0.88);
+      font-size: 14px;
+      letter-spacing: 0.02em;
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin: 0;
+    }
+
+    h1 {
+      max-width: 12ch;
+      font-size: clamp(2.35rem, 6vw, 4.4rem);
+      line-height: 0.96;
+      letter-spacing: -0.04em;
+    }
+
+    .hero p {
+      max-width: 42rem;
+      margin-top: 18px;
+      color: rgba(248, 251, 255, 0.84);
+      font-size: 1.05rem;
+    }
+
+    .hero-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    .button,
+    .button-secondary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 48px;
+      padding: 0 18px;
+      border-radius: 999px;
+      text-decoration: none;
+      font-weight: 700;
+    }
+
+    .button {
+      background: var(--accent);
+      color: #1d2731;
+    }
+
+    .button-secondary {
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #f8fbff;
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+      margin-top: 22px;
+    }
+
+    .card {
+      padding: 24px;
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      background: var(--card);
+      backdrop-filter: blur(8px);
+      box-shadow: 0 14px 36px rgba(32, 52, 75, 0.08);
+    }
+
+    .card h2 {
+      margin-bottom: 10px;
+      font-size: 1.3rem;
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+    }
+
+    .card h3 {
+      margin-bottom: 6px;
+      font-size: 1rem;
+      line-height: 1.2;
+    }
+
+    .card p + h3,
+    .card ul + h3,
+    .card h3 + h3 {
+      margin-top: 18px;
+    }
+
+    .card p,
+    .card li {
+      color: var(--ink-soft);
+    }
+
+    ul {
+      margin: 12px 0 0;
+      padding-left: 18px;
+    }
+
+    li + li {
+      margin-top: 10px;
+    }
+
+    .full {
+      grid-column: 1 / -1;
+    }
+
+    .small {
+      font-size: 0.95rem;
+    }
+
+    .footer {
+      margin-top: 20px;
+      color: var(--ink-soft);
+      font-size: 0.95rem;
+      text-align: center;
+    }
+
+    @media (max-width: 760px) {
+      .wrap {
+        padding: 18px 14px 36px;
+      }
+
+      .hero,
+      .card {
+        padding: 22px;
+        border-radius: 24px;
+      }
+
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <section class="hero">
+      <div class="eyebrow">Pocket Shift Support</div>
+      <h1>Help for the small shifts that matter.</h1>
+      <p>
+        Pocket Shift is a gentle, local-first app for noticing negative thought patterns and making room for a kinder response.
+        This page covers the most common questions about reminders, sound, history, privacy, and resetting your data.
+      </p>
+      <div class="hero-links">
+        <a class="button" href="/">Open Pocket Shift</a>
+        <a class="button-secondary" href="mailto:support@accessassured.co">Contact support</a>
+      </div>
+    </section>
+
+    <section class="grid" aria-label="Support details">
+      <article class="card">
+        <h2>What Pocket Shift does</h2>
+        <p>
+          Pocket Shift turns a simple counseling exercise into a private daily ritual. Start the day with coins in one pocket,
+          then move one whenever you notice yourself slipping into a negative loop. The goal is awareness, not punishment.
+        </p>
+      </article>
+
+      <article class="card">
+        <h2>Notifications and reminders</h2>
+        <h3>If reminders are not showing up</h3>
+        <ul>
+          <li>Make sure notifications are allowed for Pocket Shift in your device settings.</li>
+          <li>Open Pocket Shift after installation and enable reminders from Settings so the reminder can be scheduled.</li>
+          <li>Double-check the reminder time inside the app after changing time zones or restoring a device.</li>
+        </ul>
+      </article>
+
+      <article class="card">
+        <h2>Sound, haptics, and feedback</h2>
+        <h3>If a coin move feels silent</h3>
+        <ul>
+          <li>Confirm sound is enabled in Pocket Shift settings.</li>
+          <li>Check whether your device is muted or set to a focus mode that changes feedback behavior.</li>
+          <li>Haptic feedback may vary depending on device capabilities and system settings.</li>
+        </ul>
+      </article>
+
+      <article class="card">
+        <h2>History and local data</h2>
+        <h3>Where your data lives</h3>
+        <p>
+          Pocket Shift stores your sessions, settings, and history locally on your device. No account, cloud sync, or analytics
+          service is included in this build.
+        </p>
+        <h3>Important note</h3>
+        <p>
+          If you delete the app, reset app data, or replace the device without exporting first, your local history may be lost.
+        </p>
+      </article>
+
+      <article class="card full">
+        <h2>Troubleshooting checklist</h2>
+        <ul>
+          <li>Restart the app if the current day does not look right after a date or time-zone change.</li>
+          <li>Use the in-app data tools to export your data before trying a reset.</li>
+          <li>If a reminder still does not fire, turn reminders off and back on again, then reopen the app once.</li>
+          <li>If you are preparing an App Store support link, use <strong>https://pocketshift.app/support/</strong>.</li>
+        </ul>
+      </article>
+
+      <article class="card full">
+        <h2>Need more help?</h2>
+        <p>
+          Reach out at <a href="mailto:support@accessassured.co">support@accessassured.co</a> and include your device model,
+          operating system version, and a short description of what you expected to happen.
+        </p>
+        <p class="small" style="margin-top: 12px;">
+          Pocket Shift is designed around awareness, privacy, and gentle repetition. Support requests are handled with that same spirit.
+        </p>
+      </article>
+    </section>
+
+    <p class="footer">
+      Pocket Shift support page
+    </p>
+  </main>
+</body>
+</html>
