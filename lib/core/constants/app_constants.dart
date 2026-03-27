@@ -1,6 +1,10 @@
 class AppConstants {
   const AppConstants._();
 
+  static const String iosPriceLabel = 'Website stays free';
+  static const String iosStoreAvailabilityLabel = 'Coming soon on iPhone and Android';
+  static const String iosAppStoreUrl = '';
+
   static const int defaultDailyCoinCount = 10;
   static const int minDailyCoinCount = 1;
   static const int maxDailyCoinCount = 20;

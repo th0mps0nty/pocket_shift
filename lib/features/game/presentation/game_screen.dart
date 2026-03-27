@@ -1,9 +1,11 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/constants/app_constants.dart';
 import '../../../core/services/sound_effects_service.dart';
 import '../../../core/widgets/section_card.dart';
 import '../../../core/widgets/soft_background.dart';
@@ -67,6 +69,10 @@ class _GameScreenState extends ConsumerState<GameScreen> with WidgetsBindingObse
           data: (session) => ListView(
             children: [
               _Header(session: session),
+              if (kIsWeb) ...[
+                const SizedBox(height: 18),
+                const _WebPromoCard(),
+              ],
               const SizedBox(height: 18),
               const _PurposeCard(),
               const SizedBox(height: 18),
@@ -197,6 +203,58 @@ class _PurposeCard extends StatelessWidget {
             ],
           );
         },
+      ),
+    );
+  }
+}
+
+class _WebPromoCard extends StatelessWidget {
+  const _WebPromoCard();
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final hasStoreUrl = AppConstants.iosAppStoreUrl.isNotEmpty;
+
+    return SectionCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Wrap(
+            spacing: 10,
+            runSpacing: 10,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                decoration: BoxDecoration(
+                  color: context.ps.accentSurface,
+                  borderRadius: BorderRadius.circular(999),
+                ),
+                child: Text(
+                  AppConstants.iosStoreAvailabilityLabel,
+                  style: theme.textTheme.labelLarge,
+                ),
+              ),
+              Text(
+                AppConstants.iosPriceLabel,
+                style: theme.textTheme.titleMedium,
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          Text(
+            'Prefer the native mobile experience? Pocket Shift is coming soon to iPhone and Android, while this web version stays free.',
+            style: theme.textTheme.bodyLarge,
+          ),
+          if (!hasStoreUrl) ...[
+            const SizedBox(height: 10),
+            Text(
+              'The direct App Store link will be added here once the listing is live.',
+              style: theme.textTheme.bodyMedium,
+            ),
+          ],
+        ],
       ),
     );
   }
