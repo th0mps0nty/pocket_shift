@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/widgets/adaptive_secondary_scaffold.dart';
 import '../../../core/widgets/section_card.dart';
+import '../../../app/theme.dart';
 import '../application/settings_controller.dart';
 
 class ReminderCopyScreen extends ConsumerStatefulWidget {
@@ -41,9 +42,7 @@ class _ReminderCopyScreenState extends ConsumerState<ReminderCopyScreen> {
       title: 'Reminder copy',
       child: settingsAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, stackTrace) => _ReminderCopyError(
-          onRetry: () => ref.invalidate(settingsControllerProvider),
-        ),
+        error: (error, stackTrace) => _ReminderCopyError(onRetry: () => ref.invalidate(settingsControllerProvider)),
         data: (settings) {
           if (!_loaded) {
             _titleController.text = settings.reminderTitle;
@@ -53,10 +52,7 @@ class _ReminderCopyScreenState extends ConsumerState<ReminderCopyScreen> {
 
           return ListView(
             children: [
-              Text(
-                'Reminder copy',
-                style: Theme.of(context).textTheme.displayMedium,
-              ),
+              Text('Reminder copy', style: Theme.of(context).textTheme.displayMedium),
               const SizedBox(height: 8),
               Text(
                 'Write the gentle nudge you want to see each day. Keep it kind, short, and easy to receive.',
@@ -67,18 +63,15 @@ class _ReminderCopyScreenState extends ConsumerState<ReminderCopyScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      'Preview',
-                      style: Theme.of(context).textTheme.titleLarge,
-                    ),
+                    Text('Preview', style: Theme.of(context).textTheme.titleLarge),
                     const SizedBox(height: 12),
                     Container(
                       width: double.infinity,
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFF6F1E8),
+                        color: context.ps.subtleSurface,
                         borderRadius: BorderRadius.circular(24),
-                        border: Border.all(color: const Color(0xFFE6D9C6)),
+                        border: Border.all(color: context.ps.subtleBorder),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -107,19 +100,13 @@ class _ReminderCopyScreenState extends ConsumerState<ReminderCopyScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      'Title',
-                      style: Theme.of(context).textTheme.titleLarge,
-                    ),
+                    Text('Title', style: Theme.of(context).textTheme.titleLarge),
                     const SizedBox(height: 10),
                     TextField(
                       controller: _titleController,
                       maxLength: 40,
                       textInputAction: TextInputAction.next,
-                      decoration: const InputDecoration(
-                        hintText: 'Pocket Shift',
-                        border: OutlineInputBorder(),
-                      ),
+                      decoration: const InputDecoration(hintText: 'Pocket Shift', border: OutlineInputBorder()),
                       onChanged: (_) => setState(() {}),
                     ),
                     const SizedBox(height: 8),
@@ -131,8 +118,7 @@ class _ReminderCopyScreenState extends ConsumerState<ReminderCopyScreen> {
                       minLines: 3,
                       maxLines: 5,
                       decoration: const InputDecoration(
-                        hintText:
-                            'Pause for a breath and notice what pocket today is in.',
+                        hintText: 'Pause for a breath and notice what pocket today is in.',
                         border: OutlineInputBorder(),
                       ),
                       onChanged: (_) => setState(() {}),
@@ -166,17 +152,12 @@ class _ReminderCopyScreenState extends ConsumerState<ReminderCopyScreen> {
     setState(() => _saving = true);
     await ref
         .read(settingsControllerProvider.notifier)
-        .updateReminderCopy(
-          title: _titleController.text,
-          body: _bodyController.text,
-        );
+        .updateReminderCopy(title: _titleController.text, body: _bodyController.text);
     if (!mounted) {
       return;
     }
     setState(() => _saving = false);
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(const SnackBar(content: Text('Reminder copy updated.')));
+    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Reminder copy updated.')));
   }
 
   Future<void> _restoreDefaults() async {
@@ -203,10 +184,7 @@ class _ReminderCopyError extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(
-              'Reminder copy needs a quick reload.',
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
+            Text('Reminder copy needs a quick reload.', style: Theme.of(context).textTheme.titleLarge),
             const SizedBox(height: 16),
             FilledButton(onPressed: onRetry, child: const Text('Try again')),
           ],

@@ -19,6 +19,7 @@ void main() {
         reminderTitle: 'Pause and notice',
         reminderBody: 'Take a breath and check which pocket the day is in.',
         coinStyle: CoinStyle.quarter,
+        themeMode: AppThemeMode.system,
       );
 
       final roundTrip = AppSettings.fromJson(settings.toJson());
@@ -26,25 +27,22 @@ void main() {
       expect(roundTrip, settings);
     });
 
-    test(
-      'falls back to default reminder copy when blank values are provided',
-      () {
-        final settings = AppSettings.fromJson(const {
-          'dailyCoinCount': 10,
-          'hapticsEnabled': true,
-          'soundEnabled': true,
-          'remindersEnabled': true,
-          'reminderHour': 8,
-          'reminderMinute': 0,
-          'reminderTitle': '   ',
-          'reminderBody': '',
-          'coinStyle': 'penny',
-        });
+    test('falls back to default reminder copy when blank values are provided', () {
+      final settings = AppSettings.fromJson(const {
+        'dailyCoinCount': 10,
+        'hapticsEnabled': true,
+        'soundEnabled': true,
+        'remindersEnabled': true,
+        'reminderHour': 8,
+        'reminderMinute': 0,
+        'reminderTitle': '   ',
+        'reminderBody': '',
+        'coinStyle': 'penny',
+      });
 
-        expect(settings.reminderTitle, AppConstants.defaultReminderTitle);
-        expect(settings.reminderBody, AppConstants.defaultReminderBody);
-      },
-    );
+      expect(settings.reminderTitle, AppConstants.defaultReminderTitle);
+      expect(settings.reminderBody, AppConstants.defaultReminderBody);
+    });
   });
 
   group('SettingsRepository', () {
@@ -60,6 +58,7 @@ void main() {
         reminderTitle: 'Pocket check',
         reminderBody: 'Pause for one breath and notice the day.',
         coinStyle: CoinStyle.dime,
+        themeMode: AppThemeMode.system,
       );
 
       await repository.save(settings);

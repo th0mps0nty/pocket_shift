@@ -8,6 +8,7 @@ import '../../../core/services/notification_service.dart';
 import '../../../core/utils/platform_utils.dart';
 import '../../../core/widgets/adaptive_secondary_scaffold.dart';
 import '../../../core/widgets/section_card.dart';
+import '../../../app/theme.dart';
 import '../../game/application/session_controller.dart';
 import '../../history/application/history_controller.dart';
 import '../../onboarding/application/onboarding_controller.dart';
@@ -42,25 +43,16 @@ class _DataToolsScreenState extends ConsumerState<DataToolsScreen> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
-                  'Data tools need a reload.',
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
+                Text('Data tools need a reload.', style: Theme.of(context).textTheme.titleLarge),
                 const SizedBox(height: 16),
-                FilledButton(
-                  onPressed: () => ref.invalidate(appExportBundleProvider),
-                  child: const Text('Try again'),
-                ),
+                FilledButton(onPressed: () => ref.invalidate(appExportBundleProvider), child: const Text('Try again')),
               ],
             ),
           ),
         ),
         data: (bundle) => ListView(
           children: [
-            Text(
-              'Data tools',
-              style: Theme.of(context).textTheme.displayMedium,
-            ),
+            Text('Data tools', style: Theme.of(context).textTheme.displayMedium),
             const SizedBox(height: 8),
             Text(
               'Export what is stored locally or reset the app when you want a clean start.',
@@ -71,36 +63,21 @@ class _DataToolsScreenState extends ConsumerState<DataToolsScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'Export summary',
-                    style: Theme.of(context).textTheme.titleLarge,
-                  ),
+                  Text('Export summary', style: Theme.of(context).textTheme.titleLarge),
                   const SizedBox(height: 12),
                   Wrap(
                     spacing: 12,
                     runSpacing: 12,
                     children: [
-                      _SummaryChip(
-                        label: 'Sessions',
-                        value: '${bundle.sessionCount}',
-                      ),
-                      _SummaryChip(
-                        label: 'Moves noticed',
-                        value: '${bundle.totalMoves}',
-                      ),
-                      _SummaryChip(
-                        label: 'History days',
-                        value: '${bundle.history.length}',
-                      ),
+                      _SummaryChip(label: 'Sessions', value: '${bundle.sessionCount}'),
+                      _SummaryChip(label: 'Moves noticed', value: '${bundle.totalMoves}'),
+                      _SummaryChip(label: 'History days', value: '${bundle.history.length}'),
                     ],
                   ),
                   const SizedBox(height: 16),
                   SelectableText(
                     bundle.toPrettyJson(),
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      fontFamily: 'monospace',
-                      height: 1.45,
-                    ),
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontFamily: 'monospace', height: 1.45),
                   ),
                   const SizedBox(height: 16),
                   Wrap(
@@ -113,8 +90,7 @@ class _DataToolsScreenState extends ConsumerState<DataToolsScreen> {
                         label: const Text('Copy JSON export'),
                       ),
                       OutlinedButton.icon(
-                        onPressed: () =>
-                            ref.invalidate(appExportBundleProvider),
+                        onPressed: () => ref.invalidate(appExportBundleProvider),
                         icon: const Icon(Icons.refresh_rounded),
                         label: const Text('Refresh snapshot'),
                       ),
@@ -128,10 +104,7 @@ class _DataToolsScreenState extends ConsumerState<DataToolsScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'Reset tools',
-                    style: Theme.of(context).textTheme.titleLarge,
-                  ),
+                  Text('Reset tools', style: Theme.of(context).textTheme.titleLarge),
                   const SizedBox(height: 8),
                   Text(
                     'Progress reset keeps your settings. Full reset clears settings, history, reminders, and onboarding.',
@@ -143,18 +116,12 @@ class _DataToolsScreenState extends ConsumerState<DataToolsScreen> {
                     runSpacing: 12,
                     children: [
                       OutlinedButton(
-                        onPressed: _resetting
-                            ? null
-                            : () => _confirmReset(fullReset: false),
+                        onPressed: _resetting ? null : () => _confirmReset(fullReset: false),
                         child: const Text('Reset progress'),
                       ),
                       OutlinedButton(
-                        onPressed: _resetting
-                            ? null
-                            : () => _confirmReset(fullReset: true),
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: const Color(0xFF943F33),
-                        ),
+                        onPressed: _resetting ? null : () => _confirmReset(fullReset: true),
+                        style: OutlinedButton.styleFrom(foregroundColor: Theme.of(context).colorScheme.error),
                         child: Text(_resetting ? 'Resetting...' : 'Full reset'),
                       ),
                     ],
@@ -173,9 +140,7 @@ class _DataToolsScreenState extends ConsumerState<DataToolsScreen> {
     if (!mounted) {
       return;
     }
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Export copied to clipboard.')),
-    );
+    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Export copied to clipboard.')));
   }
 
   Future<void> _confirmReset({required bool fullReset}) async {
@@ -207,13 +172,9 @@ class _DataToolsScreenState extends ConsumerState<DataToolsScreen> {
     if (fullReset) {
       context.go('/');
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            'Pocket progress reset. A fresh session will be ready.',
-          ),
-        ),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Pocket progress reset. A fresh session will be ready.')));
     }
   }
 
@@ -229,15 +190,9 @@ class _DataToolsScreenState extends ConsumerState<DataToolsScreen> {
         context: context,
         builder: (context) => CupertinoAlertDialog(
           title: Text(title),
-          content: Padding(
-            padding: const EdgeInsets.only(top: 12),
-            child: Text(message),
-          ),
+          content: Padding(padding: const EdgeInsets.only(top: 12), child: Text(message)),
           actions: [
-            CupertinoDialogAction(
-              onPressed: () => Navigator.of(context).pop(false),
-              child: const Text('Cancel'),
-            ),
+            CupertinoDialogAction(onPressed: () => Navigator.of(context).pop(false), child: const Text('Cancel')),
             CupertinoDialogAction(
               isDestructiveAction: fullReset,
               onPressed: () => Navigator.of(context).pop(true),
@@ -254,14 +209,8 @@ class _DataToolsScreenState extends ConsumerState<DataToolsScreen> {
         title: Text(title),
         content: Text(message),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('Cancel'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            child: const Text('Confirm'),
-          ),
+          TextButton(onPressed: () => Navigator.of(context).pop(false), child: const Text('Cancel')),
+          FilledButton(onPressed: () => Navigator.of(context).pop(true), child: const Text('Confirm')),
         ],
       ),
     );
@@ -278,10 +227,7 @@ class _SummaryChip extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.72),
-        borderRadius: BorderRadius.circular(20),
-      ),
+      decoration: BoxDecoration(color: context.ps.chipSurface, borderRadius: BorderRadius.circular(20)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,

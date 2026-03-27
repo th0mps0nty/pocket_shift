@@ -6,10 +6,7 @@ import '../data/settings_repository.dart';
 import '../domain/app_settings.dart';
 import '../domain/coin_style.dart';
 
-final settingsControllerProvider =
-    AsyncNotifierProvider<SettingsController, AppSettings>(
-      SettingsController.new,
-    );
+final settingsControllerProvider = AsyncNotifierProvider<SettingsController, AppSettings>(SettingsController.new);
 
 class SettingsController extends AsyncNotifier<AppSettings> {
   @override
@@ -38,26 +35,20 @@ class SettingsController extends AsyncNotifier<AppSettings> {
     await _persist((current) => current.copyWith(coinStyle: style));
   }
 
+  Future<void> setThemeMode(AppThemeMode mode) async {
+    await _persist((current) => current.copyWith(themeMode: mode));
+  }
+
   Future<void> setRemindersEnabled(bool enabled) async {
     await _persist((current) => current.copyWith(remindersEnabled: enabled));
   }
 
-  Future<void> updateReminderTime({
-    required int hour,
-    required int minute,
-  }) async {
-    await _persist(
-      (current) => current.copyWith(reminderHour: hour, reminderMinute: minute),
-    );
+  Future<void> updateReminderTime({required int hour, required int minute}) async {
+    await _persist((current) => current.copyWith(reminderHour: hour, reminderMinute: minute));
   }
 
-  Future<void> updateReminderCopy({
-    required String title,
-    required String body,
-  }) async {
-    await _persist(
-      (current) => current.copyWith(reminderTitle: title, reminderBody: body),
-    );
+  Future<void> updateReminderCopy({required String title, required String body}) async {
+    await _persist((current) => current.copyWith(reminderTitle: title, reminderBody: body));
   }
 
   Future<void> resetReminderCopy() async {
@@ -69,9 +60,7 @@ class SettingsController extends AsyncNotifier<AppSettings> {
     );
   }
 
-  Future<void> _persist(
-    AppSettings Function(AppSettings current) update,
-  ) async {
+  Future<void> _persist(AppSettings Function(AppSettings current) update) async {
     final repository = ref.read(settingsRepositoryProvider);
     final notificationService = ref.read(notificationServiceProvider);
     final current = state.valueOrNull ?? await future;

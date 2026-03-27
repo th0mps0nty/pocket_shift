@@ -1,6 +1,18 @@
 import '../../../core/constants/app_constants.dart';
 import 'coin_style.dart';
 
+enum AppThemeMode {
+  system,
+  light,
+  dark;
+
+  String get storageValue => name;
+
+  static AppThemeMode fromStorageValue(String? value) {
+    return AppThemeMode.values.where((m) => m.name == value).firstOrNull ?? AppThemeMode.system;
+  }
+}
+
 class AppSettings {
   const AppSettings({
     required this.dailyCoinCount,
@@ -12,6 +24,7 @@ class AppSettings {
     required this.reminderTitle,
     required this.reminderBody,
     required this.coinStyle,
+    required this.themeMode,
   });
 
   const AppSettings.defaults()
@@ -23,7 +36,8 @@ class AppSettings {
       reminderMinute = 0,
       reminderTitle = AppConstants.defaultReminderTitle,
       reminderBody = AppConstants.defaultReminderBody,
-      coinStyle = CoinStyle.penny;
+      coinStyle = CoinStyle.penny,
+      themeMode = AppThemeMode.system;
 
   final int dailyCoinCount;
   final bool hapticsEnabled;
@@ -34,6 +48,7 @@ class AppSettings {
   final String reminderTitle;
   final String reminderBody;
   final CoinStyle coinStyle;
+  final AppThemeMode themeMode;
 
   AppSettings copyWith({
     int? dailyCoinCount,
@@ -45,6 +60,7 @@ class AppSettings {
     String? reminderTitle,
     String? reminderBody,
     CoinStyle? coinStyle,
+    AppThemeMode? themeMode,
   }) {
     return AppSettings(
       dailyCoinCount: (dailyCoinCount ?? this.dailyCoinCount).clamp(
@@ -67,6 +83,7 @@ class AppSettings {
         defaultValue: AppConstants.defaultReminderBody,
       ),
       coinStyle: coinStyle ?? this.coinStyle,
+      themeMode: themeMode ?? this.themeMode,
     );
   }
 
@@ -81,6 +98,7 @@ class AppSettings {
       'reminderTitle': reminderTitle,
       'reminderBody': reminderBody,
       'coinStyle': coinStyle.storageValue,
+      'themeMode': themeMode.storageValue,
     };
   }
 
@@ -97,15 +115,10 @@ class AppSettings {
       remindersEnabled: json['remindersEnabled'] as bool? ?? false,
       reminderHour: (json['reminderHour'] as num?)?.toInt() ?? 20,
       reminderMinute: (json['reminderMinute'] as num?)?.toInt() ?? 0,
-      reminderTitle: _normalizedStored(
-        json['reminderTitle'] as String?,
-        AppConstants.defaultReminderTitle,
-      ),
-      reminderBody: _normalizedStored(
-        json['reminderBody'] as String?,
-        AppConstants.defaultReminderBody,
-      ),
+      reminderTitle: _normalizedStored(json['reminderTitle'] as String?, AppConstants.defaultReminderTitle),
+      reminderBody: _normalizedStored(json['reminderBody'] as String?, AppConstants.defaultReminderBody),
       coinStyle: CoinStyleX.fromStorageValue(json['coinStyle'] as String?),
+      themeMode: AppThemeMode.fromStorageValue(json['themeMode'] as String?),
     );
   }
 
@@ -123,7 +136,8 @@ class AppSettings {
         other.reminderMinute == reminderMinute &&
         other.reminderTitle == reminderTitle &&
         other.reminderBody == reminderBody &&
-        other.coinStyle == coinStyle;
+        other.coinStyle == coinStyle &&
+        other.themeMode == themeMode;
   }
 
   @override
@@ -137,14 +151,11 @@ class AppSettings {
     reminderTitle,
     reminderBody,
     coinStyle,
+    themeMode,
   );
 }
 
-String _normalizedCopy(
-  String? value, {
-  required String fallback,
-  required String defaultValue,
-}) {
+String _normalizedCopy(String? value, {required String fallback, required String defaultValue}) {
   if (value == null) {
     return fallback;
   }

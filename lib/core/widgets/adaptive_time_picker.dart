@@ -3,12 +3,10 @@ import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import '../../app/theme.dart';
 import '../utils/platform_utils.dart';
 
-Future<TimeOfDay?> showAdaptivePocketTimePicker({
-  required BuildContext context,
-  required TimeOfDay initialTime,
-}) async {
+Future<TimeOfDay?> showAdaptivePocketTimePicker({required BuildContext context, required TimeOfDay initialTime}) async {
   if (!isCupertinoPlatform(Theme.of(context).platform)) {
     return showTimePicker(context: context, initialTime: initialTime);
   }
@@ -19,20 +17,14 @@ Future<TimeOfDay?> showAdaptivePocketTimePicker({
     context: context,
     builder: (popupContext) {
       final use24Hour = MediaQuery.of(popupContext).alwaysUse24HourFormat;
-      final initialDate = DateTime(
-        2026,
-        1,
-        1,
-        initialTime.hour,
-        initialTime.minute,
-      );
+      final initialDate = DateTime(2026, 1, 1, initialTime.hour, initialTime.minute);
 
       return Container(
         height: 320,
         padding: const EdgeInsets.only(top: 12),
-        decoration: const BoxDecoration(
-          color: Color(0xFFF9F6F0),
-          borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+        decoration: BoxDecoration(
+          color: popupContext.ps.subtleSurface,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
         ),
         child: SafeArea(
           top: false,
@@ -56,8 +48,8 @@ Future<TimeOfDay?> showAdaptivePocketTimePicker({
                   ],
                 ),
               ),
-              const Padding(
-                padding: EdgeInsets.fromLTRB(20, 0, 20, 10),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 0, 20, 10),
                 child: Text(
                   'Reminder',
                   maxLines: 1,
@@ -67,7 +59,7 @@ Future<TimeOfDay?> showAdaptivePocketTimePicker({
                   style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w700,
-                    color: Color(0xFF17302E),
+                    color: Theme.of(popupContext).colorScheme.onSurface,
                   ),
                 ),
               ),
@@ -78,10 +70,7 @@ Future<TimeOfDay?> showAdaptivePocketTimePicker({
                   use24hFormat: use24Hour,
                   initialDateTime: initialDate,
                   onDateTimeChanged: (value) {
-                    selected = TimeOfDay(
-                      hour: value.hour,
-                      minute: value.minute,
-                    );
+                    selected = TimeOfDay(hour: value.hour, minute: value.minute);
                   },
                 ),
               ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
+import 'package:pocket_shift/app/theme.dart';
 import 'package:pocket_shift/core/services/key_value_store.dart';
 import 'package:pocket_shift/core/services/notification_service.dart';
 import 'package:pocket_shift/features/settings/domain/app_settings.dart';
@@ -20,9 +21,7 @@ void main() {
     final container = ProviderContainer(
       overrides: [
         keyValueStoreProvider.overrideWithValue(InMemoryKeyValueStore()),
-        notificationServiceProvider.overrideWithValue(
-          _FakeNotificationService(),
-        ),
+        notificationServiceProvider.overrideWithValue(_FakeNotificationService()),
       ],
     );
     addTearDown(container.dispose);
@@ -33,12 +32,7 @@ void main() {
         GoRoute(
           path: '/settings',
           builder: (context, state) => const SettingsScreen(),
-          routes: [
-            GoRoute(
-              path: 'about',
-              builder: (context, state) => const AboutScreen(),
-            ),
-          ],
+          routes: [GoRoute(path: 'about', builder: (context, state) => const AboutScreen())],
         ),
       ],
     );
@@ -47,7 +41,7 @@ void main() {
     await tester.pumpWidget(
       UncontrolledProviderScope(
         container: container,
-        child: MaterialApp.router(routerConfig: router),
+        child: MaterialApp.router(theme: buildAppTheme(), darkTheme: buildDarkAppTheme(), routerConfig: router),
       ),
     );
 
@@ -56,11 +50,7 @@ void main() {
     expect(find.text('Settings'), findsOneWidget);
     final aboutButton = find.widgetWithText(OutlinedButton, 'Open About');
 
-    await tester.scrollUntilVisible(
-      aboutButton,
-      300,
-      scrollable: find.byType(Scrollable).first,
-    );
+    await tester.scrollUntilVisible(aboutButton, 300, scrollable: find.byType(Scrollable).first);
 
     await tester.ensureVisible(aboutButton);
     await tester.tap(aboutButton);
@@ -72,11 +62,7 @@ void main() {
     await tester.tap(find.byTooltip('Back'));
     await tester.pumpAndSettle();
 
-    await tester.scrollUntilVisible(
-      aboutButton,
-      300,
-      scrollable: find.byType(Scrollable).first,
-    );
+    await tester.scrollUntilVisible(aboutButton, 300, scrollable: find.byType(Scrollable).first);
     expect(aboutButton, findsOneWidget);
   });
 }

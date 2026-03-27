@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/services/sound_effects_service.dart';
 import '../../../core/widgets/section_card.dart';
 import '../../../core/widgets/soft_background.dart';
+import '../../../app/theme.dart';
 import '../../settings/application/settings_controller.dart';
 import '../../settings/domain/app_settings.dart';
 import '../../settings/domain/coin_style.dart';
@@ -23,8 +24,7 @@ class GameScreen extends ConsumerStatefulWidget {
   ConsumerState<GameScreen> createState() => _GameScreenState();
 }
 
-class _GameScreenState extends ConsumerState<GameScreen>
-    with WidgetsBindingObserver {
+class _GameScreenState extends ConsumerState<GameScreen> with WidgetsBindingObserver {
   int _animationTrigger = 0;
 
   @override
@@ -50,8 +50,7 @@ class _GameScreenState extends ConsumerState<GameScreen>
   Widget build(BuildContext context) {
     final sessionAsync = ref.watch(sessionControllerProvider);
     final settings = ref.watch(settingsControllerProvider).valueOrNull;
-    final reducedMotion =
-        MediaQuery.maybeOf(context)?.disableAnimations ?? false;
+    final reducedMotion = MediaQuery.maybeOf(context)?.disableAnimations ?? false;
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -108,9 +107,7 @@ class _GameScreenState extends ConsumerState<GameScreen>
         ref
             .read(soundEffectsServiceProvider)
             .playCoinLanding(
-              delay: reducedMotion
-                  ? const Duration(milliseconds: 80)
-                  : const Duration(milliseconds: 340),
+              delay: reducedMotion ? const Duration(milliseconds: 80) : const Duration(milliseconds: 340),
             ),
       );
     }
@@ -118,9 +115,7 @@ class _GameScreenState extends ConsumerState<GameScreen>
 
   Future<void> _undoMove() async {
     final settings = ref.read(settingsControllerProvider).valueOrNull;
-    final undone = await ref
-        .read(sessionControllerProvider.notifier)
-        .undoLastMove();
+    final undone = await ref.read(sessionControllerProvider.notifier).undoLastMove();
     if (!mounted || !undone) {
       return;
     }
@@ -167,14 +162,8 @@ class _Header extends StatelessWidget {
           spacing: 10,
           runSpacing: 10,
           children: [
-            _Pill(
-              icon: Icons.today_rounded,
-              label: 'Today: ${session.startingCoins} coins',
-            ),
-            _Pill(
-              icon: Icons.spa_outlined,
-              label: '${session.remainingCoins} still in the left pocket',
-            ),
+            _Pill(icon: Icons.today_rounded, label: 'Today: ${session.startingCoins} coins'),
+            _Pill(icon: Icons.spa_outlined, label: '${session.remainingCoins} still in the left pocket'),
           ],
         ),
       ],
@@ -190,18 +179,12 @@ class _PurposeCard extends StatelessWidget {
     return SectionCard(
       child: LayoutBuilder(
         builder: (context, constraints) {
-          final stacked =
-              constraints.maxWidth < 430 ||
-              MediaQuery.textScalerOf(context).scale(1) > 1.15;
+          final stacked = constraints.maxWidth < 430 || MediaQuery.textScalerOf(context).scale(1) > 1.15;
 
           if (stacked) {
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [
-                _PurposeIcon(),
-                SizedBox(height: 14),
-                _PurposeCopy(),
-              ],
+              children: const [_PurposeIcon(), SizedBox(height: 14), _PurposeCopy()],
             );
           }
 
@@ -227,10 +210,7 @@ class _PurposeIcon extends StatelessWidget {
     return Container(
       width: 52,
       height: 52,
-      decoration: const BoxDecoration(
-        color: Color(0xFFE3EEE8),
-        shape: BoxShape.circle,
-      ),
+      decoration: BoxDecoration(color: context.ps.accentSurface, shape: BoxShape.circle),
       child: const Icon(Icons.lightbulb_outline_rounded),
     );
   }
@@ -283,9 +263,7 @@ class _PocketBoard extends StatelessWidget {
       child: LayoutBuilder(
         builder: (context, constraints) {
           final vertical = constraints.maxWidth < 640 || textScale > 1.18;
-          final layout = vertical
-              ? PocketBoardLayout.vertical
-              : PocketBoardLayout.horizontal;
+          final layout = vertical ? PocketBoardLayout.vertical : PocketBoardLayout.horizontal;
           final pocketSpacing = vertical ? 12.0 : 14.0;
 
           return Container(
@@ -294,23 +272,11 @@ class _PocketBoard extends StatelessWidget {
               gradient: const LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                colors: [
-                  Color(0xFF294A70),
-                  Color(0xFF1C3550),
-                  Color(0xFF13263C),
-                ],
+                colors: [Color(0xFF294A70), Color(0xFF1C3550), Color(0xFF13263C)],
               ),
               borderRadius: BorderRadius.circular(32),
-              border: Border.all(
-                color: const Color(0xFF89A9C7).withValues(alpha: 0.24),
-              ),
-              boxShadow: const [
-                BoxShadow(
-                  blurRadius: 28,
-                  offset: Offset(0, 16),
-                  color: Color(0x24152A42),
-                ),
-              ],
+              border: Border.all(color: const Color(0xFF89A9C7).withValues(alpha: 0.24)),
+              boxShadow: const [BoxShadow(blurRadius: 28, offset: Offset(0, 16), color: Color(0x24152A42))],
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -318,10 +284,9 @@ class _PocketBoard extends StatelessWidget {
                 Center(
                   child: Text(
                     'Today\'s jeans',
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w800,
-                    ),
+                    style: Theme.of(
+                      context,
+                    ).textTheme.titleLarge?.copyWith(color: Colors.white, fontWeight: FontWeight.w800),
                   ),
                 ),
                 const SizedBox(height: 14),
@@ -406,10 +371,9 @@ class _PocketBoard extends StatelessWidget {
                         children: [
                           Text(
                             statusMessage,
-                            style: Theme.of(context).textTheme.bodyLarge
-                                ?.copyWith(
-                                  color: Colors.white.withValues(alpha: 0.92),
-                                ),
+                            style: Theme.of(
+                              context,
+                            ).textTheme.bodyLarge?.copyWith(color: Colors.white.withValues(alpha: 0.92)),
                           ),
                           const SizedBox(height: 10),
                           OutlinedButton.icon(
@@ -420,9 +384,7 @@ class _PocketBoard extends StatelessWidget {
                                 : null,
                             style: OutlinedButton.styleFrom(
                               foregroundColor: Colors.white,
-                              side: BorderSide(
-                                color: Colors.white.withValues(alpha: 0.22),
-                              ),
+                              side: BorderSide(color: Colors.white.withValues(alpha: 0.22)),
                             ),
                             icon: const Icon(Icons.undo_rounded),
                             label: const Text('Undo last'),
@@ -434,10 +396,9 @@ class _PocketBoard extends StatelessWidget {
                           Expanded(
                             child: Text(
                               statusMessage,
-                              style: Theme.of(context).textTheme.bodyLarge
-                                  ?.copyWith(
-                                    color: Colors.white.withValues(alpha: 0.92),
-                                  ),
+                              style: Theme.of(
+                                context,
+                              ).textTheme.bodyLarge?.copyWith(color: Colors.white.withValues(alpha: 0.92)),
                             ),
                           ),
                           const SizedBox(width: 12),
@@ -449,9 +410,7 @@ class _PocketBoard extends StatelessWidget {
                                 : null,
                             style: OutlinedButton.styleFrom(
                               foregroundColor: Colors.white,
-                              side: BorderSide(
-                                color: Colors.white.withValues(alpha: 0.22),
-                              ),
+                              side: BorderSide(color: Colors.white.withValues(alpha: 0.22)),
                             ),
                             icon: const Icon(Icons.undo_rounded),
                             label: const Text('Undo last'),
@@ -476,10 +435,7 @@ class _ContextCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'A little context helps',
-            style: Theme.of(context).textTheme.titleLarge,
-          ),
+          Text('A little context helps', style: Theme.of(context).textTheme.titleLarge),
           const SizedBox(height: 8),
           Text(
             'This ritual came from counseling as a way to raise awareness around negative patterns before they shape the atmosphere of the day. Pocket Shift keeps that practice light and private so a tiny pause can become a meaningful shift.',
@@ -503,22 +459,14 @@ class _Pill extends StatelessWidget {
       container: true,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-        decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.72),
-          borderRadius: BorderRadius.circular(999),
-        ),
+        decoration: BoxDecoration(color: context.ps.chipSurface, borderRadius: BorderRadius.circular(999)),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(icon, size: 22),
             const SizedBox(width: 10),
             Flexible(
-              child: Text(
-                label,
-                style: Theme.of(
-                  context,
-                ).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w700),
-              ),
+              child: Text(label, style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w700)),
             ),
           ],
         ),
@@ -539,10 +487,7 @@ class _ErrorState extends ConsumerWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(
-              'Today\'s pockets need a quick refresh.',
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
+            Text('Today\'s pockets need a quick refresh.', style: Theme.of(context).textTheme.titleLarge),
             const SizedBox(height: 12),
             Text(
               'We could not load your current session, but your local data is still here. Try again and we will pick it back up.',

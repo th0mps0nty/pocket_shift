@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/widgets/soft_background.dart';
+import '../../../app/theme.dart';
 import '../application/onboarding_controller.dart';
 
 class OnboardingScreen extends ConsumerStatefulWidget {
@@ -55,9 +56,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
           children: [
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                TextButton(onPressed: _finish, child: const Text('Skip')),
-              ],
+              children: [TextButton(onPressed: _finish, child: const Text('Skip'))],
             ),
             Expanded(
               child: PageView.builder(
@@ -87,8 +86,8 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(999),
                     color: _pageIndex == index
-                        ? const Color(0xFF3A6E69)
-                        : const Color(0xFF3A6E69).withValues(alpha: 0.18),
+                        ? Theme.of(context).colorScheme.primary
+                        : Theme.of(context).colorScheme.primary.withValues(alpha: 0.18),
                   ),
                 ),
               ),
@@ -108,10 +107,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   }
 
   Future<void> _nextPage() async {
-    await _pageController.nextPage(
-      duration: const Duration(milliseconds: 240),
-      curve: Curves.easeOut,
-    );
+    await _pageController.nextPage(duration: const Duration(milliseconds: 240), curve: Curves.easeOut);
   }
 
   Future<void> _finish() async {
@@ -134,10 +130,7 @@ class _PageCard extends StatelessWidget {
       child: Container(
         width: double.infinity,
         padding: const EdgeInsets.all(28),
-        decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.84),
-          borderRadius: BorderRadius.circular(36),
-        ),
+        decoration: BoxDecoration(color: context.ps.cardSurface, borderRadius: BorderRadius.circular(36)),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -146,29 +139,15 @@ class _PageCard extends StatelessWidget {
               height: 90,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: const Color(0xFFE2F0E7),
-                boxShadow: [
-                  BoxShadow(
-                    blurRadius: 18,
-                    offset: const Offset(0, 8),
-                    color: const Color(0xFF17302E).withValues(alpha: 0.08),
-                  ),
-                ],
+                color: context.ps.accentSurface,
+                boxShadow: [BoxShadow(blurRadius: 18, offset: const Offset(0, 8), color: context.ps.cardShadow)],
               ),
-              child: Icon(page.icon, size: 42, color: const Color(0xFF3A6E69)),
+              child: Icon(page.icon, size: 42, color: Theme.of(context).colorScheme.primary),
             ),
             const SizedBox(height: 24),
-            Text(
-              page.title,
-              textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.displayMedium,
-            ),
+            Text(page.title, textAlign: TextAlign.center, style: Theme.of(context).textTheme.displayMedium),
             const SizedBox(height: 12),
-            Text(
-              page.body,
-              textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.bodyLarge,
-            ),
+            Text(page.body, textAlign: TextAlign.center, style: Theme.of(context).textTheme.bodyLarge),
           ],
         ),
       ),
@@ -177,11 +156,7 @@ class _PageCard extends StatelessWidget {
 }
 
 class _OnboardingPageData {
-  const _OnboardingPageData({
-    required this.title,
-    required this.body,
-    required this.icon,
-  });
+  const _OnboardingPageData({required this.title, required this.body, required this.icon});
 
   final String title;
   final String body;

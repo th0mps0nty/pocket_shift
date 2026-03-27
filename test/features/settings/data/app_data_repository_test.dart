@@ -11,59 +11,55 @@ import '../../../helpers/in_memory_key_value_store.dart';
 
 void main() {
   group('AppDataRepository', () {
-    test(
-      'builds an export bundle with settings, current session, and history',
-      () async {
-        final store = InMemoryKeyValueStore();
-        final settingsRepository = SettingsRepository(store);
-        final sessionRepository = SessionRepository(store);
-        final onboardingRepository = OnboardingRepository(store);
-        final repository = AppDataRepository(
-          store: store,
-          settingsRepository: settingsRepository,
-          sessionRepository: sessionRepository,
-          onboardingRepository: onboardingRepository,
-          clock: () => DateTime.utc(2026, 3, 23, 12),
-        );
+    test('builds an export bundle with settings, current session, and history', () async {
+      final store = InMemoryKeyValueStore();
+      final settingsRepository = SettingsRepository(store);
+      final sessionRepository = SessionRepository(store);
+      final onboardingRepository = OnboardingRepository(store);
+      final repository = AppDataRepository(
+        store: store,
+        settingsRepository: settingsRepository,
+        sessionRepository: sessionRepository,
+        onboardingRepository: onboardingRepository,
+        clock: () => DateTime.utc(2026, 3, 23, 12),
+      );
 
-        await settingsRepository.save(
-          const AppSettings(
-            dailyCoinCount: 12,
-            hapticsEnabled: true,
-            soundEnabled: true,
-            remindersEnabled: true,
-            reminderHour: 8,
-            reminderMinute: 30,
-            reminderTitle: 'Pocket check',
-            reminderBody: 'Notice what pocket the day is in.',
-            coinStyle: CoinStyle.nickel,
-          ),
-        );
-        await onboardingRepository.markComplete();
+      await settingsRepository.save(
+        const AppSettings(
+          dailyCoinCount: 12,
+          hapticsEnabled: true,
+          soundEnabled: true,
+          remindersEnabled: true,
+          reminderHour: 8,
+          reminderMinute: 30,
+          reminderTitle: 'Pocket check',
+          reminderBody: 'Notice what pocket the day is in.',
+          coinStyle: CoinStyle.nickel,
+          themeMode: AppThemeMode.system,
+        ),
+      );
+      await onboardingRepository.markComplete();
 
-        final currentSession = DailySession.fresh(
-          now: DateTime.utc(2026, 3, 23, 12),
-          startingCoins: 12,
-        ).moveOne(now: DateTime.utc(2026, 3, 23, 13));
-        await sessionRepository.saveCurrentSession(currentSession);
-        await sessionRepository.archiveSession(
-          DailySession.fresh(
-                now: DateTime.utc(2026, 3, 22, 12),
-                startingCoins: 10,
-              )
-              .moveOne(now: DateTime.utc(2026, 3, 22, 13))
-              .close(now: DateTime.utc(2026, 3, 22, 22)),
-        );
+      final currentSession = DailySession.fresh(
+        now: DateTime.utc(2026, 3, 23, 12),
+        startingCoins: 12,
+      ).moveOne(now: DateTime.utc(2026, 3, 23, 13));
+      await sessionRepository.saveCurrentSession(currentSession);
+      await sessionRepository.archiveSession(
+        DailySession.fresh(
+          now: DateTime.utc(2026, 3, 22, 12),
+          startingCoins: 10,
+        ).moveOne(now: DateTime.utc(2026, 3, 22, 13)).close(now: DateTime.utc(2026, 3, 22, 22)),
+      );
 
-        final bundle = await repository.buildExportBundle();
+      final bundle = await repository.buildExportBundle();
 
-        expect(bundle.settings.dailyCoinCount, 12);
-        expect(bundle.currentSession?.movedCoins, 1);
-        expect(bundle.history.length, 1);
-        expect(bundle.onboardingComplete, isTrue);
-        expect(bundle.totalMoves, 2);
-      },
-    );
+      expect(bundle.settings.dailyCoinCount, 12);
+      expect(bundle.currentSession?.movedCoins, 1);
+      expect(bundle.history.length, 1);
+      expect(bundle.onboardingComplete, isTrue);
+      expect(bundle.totalMoves, 2);
+    });
 
     test('resetProgressOnly clears sessions and preserves settings', () async {
       final store = InMemoryKeyValueStore();
@@ -80,17 +76,9 @@ void main() {
 
       await settingsRepository.save(const AppSettings.defaults());
       await sessionRepository.saveCurrentSession(
-        DailySession.fresh(
-          now: DateTime.utc(2026, 3, 23, 12),
-          startingCoins: 10,
-        ),
+        DailySession.fresh(now: DateTime.utc(2026, 3, 23, 12), startingCoins: 10),
       );
-      await sessionRepository.archiveSession(
-        DailySession.fresh(
-          now: DateTime.utc(2026, 3, 22, 12),
-          startingCoins: 10,
-        ),
-      );
+      await sessionRepository.archiveSession(DailySession.fresh(now: DateTime.utc(2026, 3, 22, 12), startingCoins: 10));
 
       await repository.resetProgressOnly();
 
@@ -123,21 +111,14 @@ void main() {
           reminderTitle: 'Check in',
           reminderBody: 'Take stock of the day.',
           coinStyle: CoinStyle.quarter,
+          themeMode: AppThemeMode.system,
         ),
       );
       await onboardingRepository.markComplete();
       await sessionRepository.saveCurrentSession(
-        DailySession.fresh(
-          now: DateTime.utc(2026, 3, 23, 12),
-          startingCoins: 6,
-        ),
+        DailySession.fresh(now: DateTime.utc(2026, 3, 23, 12), startingCoins: 6),
       );
-      await sessionRepository.archiveSession(
-        DailySession.fresh(
-          now: DateTime.utc(2026, 3, 22, 12),
-          startingCoins: 6,
-        ),
-      );
+      await sessionRepository.archiveSession(DailySession.fresh(now: DateTime.utc(2026, 3, 22, 12), startingCoins: 6));
 
       await repository.resetEverything();
 

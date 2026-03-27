@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../app/theme.dart';
 import '../utils/platform_utils.dart';
 
 class AppShell extends StatelessWidget {
@@ -12,34 +13,23 @@ class AppShell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final useCupertino = isCupertinoPlatform(Theme.of(context).platform);
+    final colors = context.ps;
 
     return Scaffold(
       body: navigationShell,
       bottomNavigationBar: useCupertino
           ? CupertinoTabBar(
               currentIndex: navigationShell.currentIndex,
-              activeColor: const Color(0xFF3A6E69),
-              inactiveColor: const Color(0xFF667784),
-              backgroundColor: Colors.white.withValues(alpha: 0.94),
+              activeColor: Theme.of(context).colorScheme.primary,
+              inactiveColor: colors.navBarInactive,
+              backgroundColor: colors.navBarSurface,
               onTap: (index) {
-                navigationShell.goBranch(
-                  index,
-                  initialLocation: index == navigationShell.currentIndex,
-                );
+                navigationShell.goBranch(index, initialLocation: index == navigationShell.currentIndex);
               },
               items: const [
-                BottomNavigationBarItem(
-                  icon: Icon(CupertinoIcons.money_dollar_circle),
-                  label: 'Today',
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(CupertinoIcons.time),
-                  label: 'History',
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(CupertinoIcons.settings),
-                  label: 'Settings',
-                ),
+                BottomNavigationBarItem(icon: Icon(CupertinoIcons.money_dollar_circle), label: 'Today'),
+                BottomNavigationBarItem(icon: Icon(CupertinoIcons.time), label: 'History'),
+                BottomNavigationBarItem(icon: Icon(CupertinoIcons.settings), label: 'Settings'),
               ],
             )
           : Padding(
@@ -49,10 +39,7 @@ class AppShell extends StatelessWidget {
                 child: NavigationBar(
                   selectedIndex: navigationShell.currentIndex,
                   onDestinationSelected: (index) {
-                    navigationShell.goBranch(
-                      index,
-                      initialLocation: index == navigationShell.currentIndex,
-                    );
+                    navigationShell.goBranch(index, initialLocation: index == navigationShell.currentIndex);
                   },
                   destinations: const [
                     NavigationDestination(

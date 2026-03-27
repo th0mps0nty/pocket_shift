@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/utils/date_utils.dart';
 import '../../../core/widgets/section_card.dart';
 import '../../../core/widgets/soft_background.dart';
+import '../../../app/theme.dart';
 import '../../game/domain/daily_session.dart';
 import '../application/history_controller.dart';
 import '../domain/history_timeline_item.dart';
@@ -25,10 +26,7 @@ class HistoryScreen extends ConsumerWidget {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(
-                    'History needs a quick reload.',
-                    style: Theme.of(context).textTheme.titleLarge,
-                  ),
+                  Text('History needs a quick reload.', style: Theme.of(context).textTheme.titleLarge),
                   const SizedBox(height: 16),
                   FilledButton(
                     onPressed: () => ref.invalidate(historyTimelineProvider),
@@ -79,29 +77,22 @@ class _HistoryCard extends StatelessWidget {
             children: [
               Expanded(
                 child: Text(
-                  item.isCurrent
-                      ? 'Today'
-                      : PocketShiftDateUtils.formatSessionDate(session.date),
+                  item.isCurrent ? 'Today' : PocketShiftDateUtils.formatSessionDate(session.date),
                   style: theme.textTheme.titleLarge,
                 ),
               ),
               DecoratedBox(
                 decoration: BoxDecoration(
-                  color: item.isCurrent
-                      ? const Color(0xFFE2F0E7)
-                      : const Color(0xFFF4E9DE),
+                  color: item.isCurrent ? context.ps.badgeCurrent : context.ps.badgeClosed,
                   borderRadius: BorderRadius.circular(999),
                 ),
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 6,
-                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   child: Text(
                     item.isCurrent ? 'In progress' : 'Closed',
                     style: theme.textTheme.bodyMedium?.copyWith(
                       fontWeight: FontWeight.w700,
-                      color: const Color(0xFF17302E),
+                      color: theme.colorScheme.onSurface,
                     ),
                   ),
                 ),
@@ -145,10 +136,7 @@ class _StatChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DecoratedBox(
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.75),
-        borderRadius: BorderRadius.circular(20),
-      ),
+      decoration: BoxDecoration(color: context.ps.chipSurface, borderRadius: BorderRadius.circular(20)),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         child: Column(

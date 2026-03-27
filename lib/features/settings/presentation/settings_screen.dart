@@ -7,6 +7,7 @@ import '../../../core/widgets/adaptive_option_picker.dart';
 import '../../../core/widgets/adaptive_time_picker.dart';
 import '../../../core/widgets/section_card.dart';
 import '../../../core/widgets/soft_background.dart';
+import '../../../app/theme.dart';
 import '../application/settings_controller.dart';
 import '../domain/app_settings.dart';
 import '../domain/coin_style.dart';
@@ -28,10 +29,7 @@ class SettingsScreen extends ConsumerWidget {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(
-                    'Settings need a reload.',
-                    style: Theme.of(context).textTheme.titleLarge,
-                  ),
+                  Text('Settings need a reload.', style: Theme.of(context).textTheme.titleLarge),
                   const SizedBox(height: 16),
                   FilledButton(
                     onPressed: () => ref.invalidate(settingsControllerProvider),
@@ -43,16 +41,15 @@ class SettingsScreen extends ConsumerWidget {
           ),
           data: (settings) => ListView(
             children: [
-              Text(
-                'Settings',
-                style: Theme.of(context).textTheme.displayMedium,
-              ),
+              Text('Settings', style: Theme.of(context).textTheme.displayMedium),
               const SizedBox(height: 8),
               Text(
                 'Make Pocket Shift feel calm, familiar, and easy to return to.',
                 style: Theme.of(context).textTheme.bodyLarge,
               ),
               const SizedBox(height: 20),
+              _AppearanceCard(settings: settings),
+              const SizedBox(height: 14),
               _DailyCoinsCard(settings: settings),
               const SizedBox(height: 14),
               _CoinStyleCard(settings: settings),
@@ -61,10 +58,7 @@ class SettingsScreen extends ConsumerWidget {
               const SizedBox(height: 14),
               _ReminderCard(settings: settings),
               const SizedBox(height: 14),
-              _ReminderCopyCard(
-                settings: settings,
-                onTap: () => context.push('/settings/reminder-copy'),
-              ),
+              _ReminderCopyCard(settings: settings, onTap: () => context.push('/settings/reminder-copy')),
               const SizedBox(height: 14),
               _DataToolsCard(onTap: () => context.push('/settings/data-tools')),
               const SizedBox(height: 14),
@@ -72,6 +66,45 @@ class SettingsScreen extends ConsumerWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _AppearanceCard extends ConsumerWidget {
+  const _AppearanceCard({required this.settings});
+
+  final AppSettings settings;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return SectionCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Appearance', style: Theme.of(context).textTheme.titleLarge),
+          const SizedBox(height: 6),
+          Text('Choose how Pocket Shift looks.', style: Theme.of(context).textTheme.bodyMedium),
+          const SizedBox(height: 16),
+          SizedBox(
+            width: double.infinity,
+            child: SegmentedButton<AppThemeMode>(
+              segments: const [
+                ButtonSegment(
+                  value: AppThemeMode.system,
+                  label: Text('System'),
+                  icon: Icon(Icons.brightness_auto_outlined),
+                ),
+                ButtonSegment(value: AppThemeMode.light, label: Text('Light'), icon: Icon(Icons.light_mode_outlined)),
+                ButtonSegment(value: AppThemeMode.dark, label: Text('Dark'), icon: Icon(Icons.dark_mode_outlined)),
+              ],
+              selected: {settings.themeMode},
+              onSelectionChanged: (selected) {
+                ref.read(settingsControllerProvider.notifier).setThemeMode(selected.first);
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -99,33 +132,20 @@ class _DailyCoinsCard extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 14,
-                  vertical: 10,
-                ),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF4EBDD),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Text(
-                  '${settings.dailyCoinCount}',
-                  style: Theme.of(context).textTheme.headlineMedium,
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                decoration: BoxDecoration(color: context.ps.subtleSurface, borderRadius: BorderRadius.circular(20)),
+                child: Text('${settings.dailyCoinCount}', style: Theme.of(context).textTheme.headlineMedium),
               ),
               const SizedBox(width: 12),
               Expanded(
                 child: Slider(
                   min: AppConstants.minDailyCoinCount.toDouble(),
                   max: AppConstants.maxDailyCoinCount.toDouble(),
-                  divisions:
-                      AppConstants.maxDailyCoinCount -
-                      AppConstants.minDailyCoinCount,
+                  divisions: AppConstants.maxDailyCoinCount - AppConstants.minDailyCoinCount,
                   label: '${settings.dailyCoinCount}',
                   value: settings.dailyCoinCount.toDouble(),
                   onChanged: (value) {
-                    ref
-                        .read(settingsControllerProvider.notifier)
-                        .updateDailyCoinCount(value.round());
+                    ref.read(settingsControllerProvider.notifier).updateDailyCoinCount(value.round());
                   },
                 ),
               ),
@@ -150,17 +170,12 @@ class _CoinStyleCard extends ConsumerWidget {
         children: [
           Text('Coin style', style: Theme.of(context).textTheme.titleLarge),
           const SizedBox(height: 6),
-          Text(
-            'Use the pocket change that feels right for you.',
-            style: Theme.of(context).textTheme.bodyMedium,
-          ),
+          Text('Use the pocket change that feels right for you.', style: Theme.of(context).textTheme.bodyMedium),
           const SizedBox(height: 16),
           ListTile(
             contentPadding: EdgeInsets.zero,
             title: const Text('Selected coin'),
-            subtitle: Text(
-              '${settings.coinStyle.label} • ${settings.coinStyle.description}',
-            ),
+            subtitle: Text('${settings.coinStyle.label} • ${settings.coinStyle.description}'),
             trailing: const Icon(Icons.chevron_right_rounded),
             onTap: () async {
               final picked = await showAdaptiveOptionPicker<CoinStyle>(
@@ -169,20 +184,15 @@ class _CoinStyleCard extends ConsumerWidget {
                 selectedValue: settings.coinStyle,
                 options: CoinStyle.values
                     .map(
-                      (style) => AdaptiveOption<CoinStyle>(
-                        value: style,
-                        title: style.label,
-                        subtitle: style.description,
-                      ),
+                      (style) =>
+                          AdaptiveOption<CoinStyle>(value: style, title: style.label, subtitle: style.description),
                     )
                     .toList(),
               );
               if (picked == null) {
                 return;
               }
-              await ref
-                  .read(settingsControllerProvider.notifier)
-                  .setCoinStyle(picked);
+              await ref.read(settingsControllerProvider.notifier).setCoinStyle(picked);
             },
           ),
         ],
@@ -207,21 +217,15 @@ class _PreferencesCard extends ConsumerWidget {
             subtitle: const Text('A small tap when you move or undo a coin.'),
             value: settings.hapticsEnabled,
             onChanged: (value) {
-              ref
-                  .read(settingsControllerProvider.notifier)
-                  .setHapticsEnabled(value);
+              ref.read(settingsControllerProvider.notifier).setHapticsEnabled(value);
             },
           ),
           SwitchListTile.adaptive(
             title: const Text('Sound'),
-            subtitle: const Text(
-              'A light pocket-change landing when the coin drops.',
-            ),
+            subtitle: const Text('A light pocket-change landing when the coin drops.'),
             value: settings.soundEnabled,
             onChanged: (value) {
-              ref
-                  .read(settingsControllerProvider.notifier)
-                  .setSoundEnabled(value);
+              ref.read(settingsControllerProvider.notifier).setSoundEnabled(value);
             },
           ),
         ],
@@ -237,9 +241,9 @@ class _ReminderCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final timeLabel = MaterialLocalizations.of(context).formatTimeOfDay(
-      TimeOfDay(hour: settings.reminderHour, minute: settings.reminderMinute),
-    );
+    final timeLabel = MaterialLocalizations.of(
+      context,
+    ).formatTimeOfDay(TimeOfDay(hour: settings.reminderHour, minute: settings.reminderMinute));
 
     return SectionCard(
       padding: const EdgeInsets.symmetric(vertical: 6),
@@ -250,9 +254,7 @@ class _ReminderCard extends ConsumerWidget {
             subtitle: const Text('A gentle nudge to check your pockets.'),
             value: settings.remindersEnabled,
             onChanged: (value) async {
-              await ref
-                  .read(settingsControllerProvider.notifier)
-                  .setRemindersEnabled(value);
+              await ref.read(settingsControllerProvider.notifier).setRemindersEnabled(value);
               if (context.mounted && value) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
@@ -273,20 +275,14 @@ class _ReminderCard extends ConsumerWidget {
                 ? () async {
                     final picked = await showAdaptivePocketTimePicker(
                       context: context,
-                      initialTime: TimeOfDay(
-                        hour: settings.reminderHour,
-                        minute: settings.reminderMinute,
-                      ),
+                      initialTime: TimeOfDay(hour: settings.reminderHour, minute: settings.reminderMinute),
                     );
                     if (picked == null) {
                       return;
                     }
                     await ref
                         .read(settingsControllerProvider.notifier)
-                        .updateReminderTime(
-                          hour: picked.hour,
-                          minute: picked.minute,
-                        );
+                        .updateReminderTime(hour: picked.hour, minute: picked.minute);
                   }
                 : null,
           ),
@@ -310,31 +306,22 @@ class _ReminderCopyCard extends StatelessWidget {
         children: [
           Text('Reminder copy', style: Theme.of(context).textTheme.titleLarge),
           const SizedBox(height: 8),
-          Text(
-            'Customize the words that show up in your daily nudge.',
-            style: Theme.of(context).textTheme.bodyMedium,
-          ),
+          Text('Customize the words that show up in your daily nudge.', style: Theme.of(context).textTheme.bodyMedium),
           const SizedBox(height: 14),
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: const Color(0xFFF7F1E8),
+              color: context.ps.subtleSurface,
               borderRadius: BorderRadius.circular(24),
-              border: Border.all(color: const Color(0xFFE8DAC8)),
+              border: Border.all(color: context.ps.subtleBorder),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  settings.reminderTitle,
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
+                Text(settings.reminderTitle, style: Theme.of(context).textTheme.titleLarge),
                 const SizedBox(height: 6),
-                Text(
-                  settings.reminderBody,
-                  style: Theme.of(context).textTheme.bodyMedium,
-                ),
+                Text(settings.reminderBody, style: Theme.of(context).textTheme.bodyMedium),
               ],
             ),
           ),
@@ -396,10 +383,7 @@ class _AboutCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'About & credits',
-            style: Theme.of(context).textTheme.titleLarge,
-          ),
+          Text('About & credits', style: Theme.of(context).textTheme.titleLarge),
           const SizedBox(height: 8),
           Text(
             'Read the story behind Pocket Shift, the inspiration from counseling, and the full credit note.',
