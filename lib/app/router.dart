@@ -10,6 +10,8 @@ import '../core/widgets/soft_background.dart';
 import '../features/game/application/session_controller.dart';
 import '../features/game/presentation/game_screen.dart';
 import '../features/history/presentation/history_screen.dart';
+import '../features/history/presentation/session_detail_screen.dart';
+import '../features/insights/presentation/insights_screen.dart';
 import '../features/onboarding/application/onboarding_controller.dart';
 import '../features/onboarding/presentation/onboarding_screen.dart';
 import '../features/settings/application/settings_controller.dart';
@@ -71,6 +73,30 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                   context: context,
                   state: state,
                   child: const HistoryScreen(),
+                ),
+                routes: [
+                  GoRoute(
+                    path: ':sessionId',
+                    pageBuilder: (context, state) => _buildAdaptivePage(
+                      context: context,
+                      state: state,
+                      child: SessionDetailScreen(
+                        sessionId: state.pathParameters['sessionId']!,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/insights',
+                pageBuilder: (context, state) => _buildAdaptivePage(
+                  context: context,
+                  state: state,
+                  child: const InsightsScreen(),
                 ),
               ),
             ],

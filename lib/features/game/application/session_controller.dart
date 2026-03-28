@@ -4,6 +4,7 @@ import '../../../core/utils/clock.dart';
 import '../../settings/application/settings_controller.dart';
 import '../data/session_repository.dart';
 import '../domain/daily_session.dart';
+import '../domain/trigger_tag.dart';
 
 final sessionControllerProvider = AsyncNotifierProvider<SessionController, DailySession>(SessionController.new);
 
@@ -53,5 +54,47 @@ class SessionController extends AsyncNotifier<DailySession> {
     state = AsyncData(next);
     await repository.saveCurrentSession(next);
     return true;
+  }
+
+  Future<bool> annotateLastMove({
+    TriggerTag? triggerTag,
+    String? note,
+  }) async {
+    await refreshForToday();
+    final repository = ref.read(sessionRepositoryProvider);
+    final clock = ref.read(clockProvider);
+    final current = state.valueOrNull ?? await future;
+    if (current.moves.isEmpty) {
+      return false;
+    }
+
+    final next = current.annotateLastMove(
+      now: clock(),
+      triggerTag: triggerTag,
+      note: note,
+    );
+    state = AsyncData(next);
+    await repository.saveCurrentSession(next);
+    return true;
+  }
+
+  Future<void> saveReflection({
+    String? whatShowedUp,
+    String? whatHelped,
+    String? forTomorrow,
+  }) async {
+    await refreshForToday();
+    final repository = ref.read(sessionRepositoryProvider);
+    final clock = ref.read(clockProvider);
+    final current = state.valueOrNull ?? await future;
+    final next = current.saveReflection(
+      now: clock(),
+      whatShowedUp: whatShowedUp,
+      whatHelped: whatHelped,
+      forTomorrow: forTomorrow,
+    );
+
+    state = AsyncData(next);
+    await repository.saveCurrentSession(next);
   }
 }

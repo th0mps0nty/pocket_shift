@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/constants/app_constants.dart';
 import '../../../core/widgets/adaptive_option_picker.dart';
@@ -62,11 +63,63 @@ class SettingsScreen extends ConsumerWidget {
               const SizedBox(height: 14),
               _DataToolsCard(onTap: () => context.push('/settings/data-tools')),
               const SizedBox(height: 14),
+              const _SupportCard(),
+              const SizedBox(height: 14),
               _AboutCard(onTap: () => context.push('/settings/about')),
             ],
           ),
         ),
       ),
+    );
+  }
+}
+
+class _SupportCard extends StatelessWidget {
+  const _SupportCard();
+
+  @override
+  Widget build(BuildContext context) {
+    return SectionCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Support & privacy', style: Theme.of(context).textTheme.titleLarge),
+          const SizedBox(height: 8),
+          Text(
+            'Keep support and privacy details easy to reach right from the app.',
+            style: Theme.of(context).textTheme.bodyMedium,
+          ),
+          const SizedBox(height: 14),
+          Wrap(
+            spacing: 12,
+            runSpacing: 12,
+            children: [
+              OutlinedButton.icon(
+                onPressed: () => _openExternal(context, AppConstants.supportUrl),
+                icon: const Icon(Icons.support_agent_outlined),
+                label: const Text('Open support'),
+              ),
+              OutlinedButton.icon(
+                onPressed: () => _openExternal(context, AppConstants.privacyUrl),
+                icon: const Icon(Icons.privacy_tip_outlined),
+                label: const Text('Open privacy policy'),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _openExternal(BuildContext context, String url) async {
+    final uri = Uri.parse(url);
+    final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
+    if (launched || !context.mounted) {
+      return;
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Could not open $url right now.')),
     );
   }
 }

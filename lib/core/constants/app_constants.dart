@@ -4,6 +4,8 @@ class AppConstants {
   static const String iosPriceLabel = 'Website stays free';
   static const String iosStoreAvailabilityLabel = 'Coming soon on iPhone and Android';
   static const String iosAppStoreUrl = '';
+  static const String supportUrl = 'https://pocketshift.app/support/';
+  static const String privacyUrl = 'https://pocketshift.app/privacy/';
 
   static const int defaultDailyCoinCount = 10;
   static const int minDailyCoinCount = 1;

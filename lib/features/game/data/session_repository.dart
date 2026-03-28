@@ -59,6 +59,43 @@ class SessionRepository {
     );
   }
 
+  Future<void> updateHistorySession(DailySession session) async {
+    final history = await loadHistory();
+    final updated = [
+      for (final existing in history)
+        if (existing.id == session.id) session else existing,
+    ];
+
+    await _store.setString(
+      AppConstants.historyKey,
+      jsonEncode(updated.map((item) => item.toJson()).toList()),
+    );
+  }
+
+  Future<DailySession?> loadSessionById(String sessionId) async {
+    final current = await loadCurrentSession();
+    if (current?.id == sessionId) {
+      return current;
+    }
+
+    final history = await loadHistory();
+    for (final session in history) {
+      if (session.id == sessionId) {
+        return session;
+      }
+    }
+    return null;
+  }
+
+  Future<List<DailySession>> loadAllSessions({DailySession? currentSession}) async {
+    final history = await loadHistory();
+    final current = currentSession ?? await loadCurrentSession();
+    if (current == null) {
+      return history;
+    }
+    return [current, ...history];
+  }
+
   Future<List<DailySession>> loadHistory() async {
     final raw = await _store.getString(AppConstants.historyKey);
     if (raw == null || raw.isEmpty) {

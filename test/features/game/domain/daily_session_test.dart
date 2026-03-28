@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pocket_shift/features/game/domain/coin_move.dart';
 import 'package:pocket_shift/features/game/domain/daily_session.dart';
+import 'package:pocket_shift/features/game/domain/trigger_tag.dart';
 
 void main() {
   group('DailySession', () {
@@ -22,6 +23,49 @@ void main() {
       final updated = session.moveOne(now: now.add(const Duration(minutes: 1)), reason: 'noticed the shift');
 
       expect(updated.moves.first.reason, 'noticed the shift');
+    });
+
+    test('annotateLastMove updates the most recent move with a tag and note', () {
+      final now = DateTime(2026, 3, 22, 9);
+      final session = DailySession.fresh(
+        now: now,
+        startingCoins: 10,
+      ).moveOne(now: now.add(const Duration(minutes: 1)));
+
+      final updated = session.annotateLastMove(
+        now: now.add(const Duration(minutes: 2)),
+        triggerTag: TriggerTag.complaining,
+        note: 'Felt sharp in the car.',
+      );
+
+      expect(updated.moves.first.triggerTag, TriggerTag.complaining);
+      expect(updated.moves.first.note, 'Felt sharp in the car.');
+    });
+
+    test('saveReflection marks the session as a check-in even without moves', () {
+      final now = DateTime(2026, 3, 22, 9);
+      final session = DailySession.fresh(now: now, startingCoins: 10);
+
+      final updated = session.saveReflection(
+        now: now.add(const Duration(hours: 12)),
+        whatShowedUp: 'I was tense and impatient.',
+        whatHelped: 'A short walk.',
+        forTomorrow: 'Start slower.',
+      );
+
+      expect(updated.hasReflection, isTrue);
+      expect(updated.hasCheckIn, isTrue);
+      expect(updated.reflection?.whatHelped, 'A short walk.');
+    });
+
+    test('topTrigger returns the most frequent trigger tag', () {
+      final now = DateTime(2026, 3, 22, 9);
+      final session = DailySession.fresh(now: now, startingCoins: 10)
+          .moveOne(now: now.add(const Duration(minutes: 1)), triggerTag: TriggerTag.complaining)
+          .moveOne(now: now.add(const Duration(minutes: 2)), triggerTag: TriggerTag.complaining)
+          .moveOne(now: now.add(const Duration(minutes: 3)), triggerTag: TriggerTag.workStress);
+
+      expect(session.topTrigger, TriggerTag.complaining);
     });
 
     test('moveOne is a no-op when no coins remain', () {

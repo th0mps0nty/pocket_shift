@@ -15,6 +15,7 @@ import '../../settings/domain/app_settings.dart';
 import '../../settings/domain/coin_style.dart';
 import '../application/session_controller.dart';
 import '../domain/daily_session.dart';
+import '../domain/trigger_tag.dart';
 import 'widgets/coin_transfer_overlay.dart';
 import 'widgets/pocket_card.dart';
 import 'widgets/primary_coin_button.dart';
@@ -86,6 +87,11 @@ class _GameScreenState extends ConsumerState<GameScreen> with WidgetsBindingObse
                 statusMessage: _statusMessage(session),
               ),
               const SizedBox(height: 18),
+              _AwarenessCard(
+                session: session,
+                onOpenReflection: _openReflectionEditor,
+              ),
+              const SizedBox(height: 18),
               const _ContextCard(),
             ],
           ),
@@ -117,6 +123,18 @@ class _GameScreenState extends ConsumerState<GameScreen> with WidgetsBindingObse
             ),
       );
     }
+
+    if (!mounted) {
+      return;
+    }
+
+    if (!reducedMotion) {
+      await Future<void>.delayed(const Duration(milliseconds: 140));
+    }
+    if (!mounted) {
+      return;
+    }
+    await _promptForLastMoveDetails();
   }
 
   Future<void> _undoMove() async {
@@ -142,6 +160,51 @@ class _GameScreenState extends ConsumerState<GameScreen> with WidgetsBindingObse
       return 'You noticed it. That counts.';
     }
     return 'You are building awareness one little flip at a time.';
+  }
+
+  Future<void> _promptForLastMoveDetails() async {
+    final result = await showModalBottomSheet<_MoveCaptureResult>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => const _MoveCaptureSheet(),
+    );
+    if (result == null) {
+      return;
+    }
+
+    await ref.read(sessionControllerProvider.notifier).annotateLastMove(
+      triggerTag: result.triggerTag,
+      note: result.note,
+    );
+  }
+
+  Future<void> _openReflectionEditor() async {
+    final session = ref.read(sessionControllerProvider).valueOrNull;
+    if (session == null) {
+      return;
+    }
+
+    final result = await showModalBottomSheet<_ReflectionDraft>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => _ReflectionEditorSheet(
+        initialWhatShowedUp: session.reflection?.whatShowedUp,
+        initialWhatHelped: session.reflection?.whatHelped,
+        initialForTomorrow: session.reflection?.forTomorrow,
+      ),
+    );
+
+    if (result == null) {
+      return;
+    }
+
+    await ref.read(sessionControllerProvider.notifier).saveReflection(
+      whatShowedUp: result.whatShowedUp,
+      whatHelped: result.whatHelped,
+      forTomorrow: result.forTomorrow,
+    );
   }
 }
 
@@ -289,6 +352,85 @@ class _PurposeCopy extends StatelessWidget {
           style: Theme.of(context).textTheme.bodyMedium,
         ),
       ],
+    );
+  }
+}
+
+class _AwarenessCard extends StatelessWidget {
+  const _AwarenessCard({
+    required this.session,
+    required this.onOpenReflection,
+  });
+
+  final DailySession session;
+  final Future<void> Function() onOpenReflection;
+
+  @override
+  Widget build(BuildContext context) {
+    final taggedMoves = session.moves.where((move) => move.triggerTag != null).length;
+
+    return SectionCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Today’s awareness', style: Theme.of(context).textTheme.titleLarge),
+          const SizedBox(height: 8),
+          Text(
+            session.movedCoins == 0
+                ? 'When you notice a shift, tag what was going on. Over time, your history and weekly insights will show patterns that are hard to see in the moment.'
+                : 'Each move can hold a little context. Tagging what happened makes your weekly patterns more useful and more honest.',
+            style: Theme.of(context).textTheme.bodyMedium,
+          ),
+          const SizedBox(height: 16),
+          Wrap(
+            spacing: 12,
+            runSpacing: 12,
+            children: [
+              _Pill(icon: Icons.label_outline_rounded, label: '$taggedMoves tagged shifts'),
+              _Pill(
+                icon: Icons.insights_outlined,
+                label: session.topTrigger == null ? 'No top trigger yet' : 'Top trigger: ${session.topTrigger!.label}',
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: context.ps.subtleSurface,
+              borderRadius: BorderRadius.circular(24),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  session.hasReflection ? 'Today’s reflection' : 'End-of-day reflection',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  session.hasReflection
+                      ? session.reflection?.whatShowedUp ??
+                          session.reflection?.whatHelped ??
+                          session.reflection?.forTomorrow ??
+                          'Reflection saved.'
+                      : 'Capture what showed up, what helped, and what you want tomorrow to feel like.',
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+                const SizedBox(height: 14),
+                OutlinedButton.icon(
+                  onPressed: () {
+                    unawaited(onOpenReflection());
+                  },
+                  icon: const Icon(Icons.auto_stories_outlined),
+                  label: Text(session.hasReflection ? 'Edit reflection' : 'Add reflection'),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -500,6 +642,224 @@ class _ContextCard extends StatelessWidget {
             style: Theme.of(context).textTheme.bodyLarge,
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _MoveCaptureResult {
+  const _MoveCaptureResult({this.triggerTag, this.note});
+
+  final TriggerTag? triggerTag;
+  final String? note;
+}
+
+class _MoveCaptureSheet extends StatefulWidget {
+  const _MoveCaptureSheet();
+
+  @override
+  State<_MoveCaptureSheet> createState() => _MoveCaptureSheetState();
+}
+
+class _MoveCaptureSheetState extends State<_MoveCaptureSheet> {
+  final TextEditingController _noteController = TextEditingController();
+  TriggerTag? _selectedTag;
+
+  @override
+  void dispose() {
+    _noteController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final bottom = MediaQuery.of(context).viewInsets.bottom;
+    return SafeArea(
+      child: Padding(
+        padding: EdgeInsets.fromLTRB(12, 12, 12, bottom + 12),
+        child: Material(
+          color: Theme.of(context).scaffoldBackgroundColor,
+          borderRadius: BorderRadius.circular(28),
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('What triggered that shift?', style: Theme.of(context).textTheme.titleLarge),
+                const SizedBox(height: 8),
+                Text(
+                  'Add a little context while the moment is still fresh. You can skip this if you just want the move recorded.',
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+                const SizedBox(height: 16),
+                Wrap(
+                  spacing: 10,
+                  runSpacing: 10,
+                  children: TriggerTag.values.map((tag) {
+                    final selected = tag == _selectedTag;
+                    return ChoiceChip(
+                      label: Text(tag.label),
+                      selected: selected,
+                      onSelected: (_) {
+                        setState(() {
+                          _selectedTag = selected ? null : tag;
+                        });
+                      },
+                    );
+                  }).toList(),
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: _noteController,
+                  maxLines: 3,
+                  textInputAction: TextInputAction.done,
+                  decoration: const InputDecoration(
+                    labelText: 'Optional note',
+                    hintText: 'What happened in that moment?',
+                  ),
+                ),
+                const SizedBox(height: 18),
+                Row(
+                  children: [
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      child: const Text('Skip'),
+                    ),
+                    const Spacer(),
+                    FilledButton(
+                      onPressed: () {
+                        Navigator.of(context).pop(
+                          _MoveCaptureResult(
+                            triggerTag: _selectedTag,
+                            note: _noteController.text,
+                          ),
+                        );
+                      },
+                      child: const Text('Save details'),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ReflectionDraft {
+  const _ReflectionDraft({
+    this.whatShowedUp,
+    this.whatHelped,
+    this.forTomorrow,
+  });
+
+  final String? whatShowedUp;
+  final String? whatHelped;
+  final String? forTomorrow;
+}
+
+class _ReflectionEditorSheet extends StatefulWidget {
+  const _ReflectionEditorSheet({
+    this.initialWhatShowedUp,
+    this.initialWhatHelped,
+    this.initialForTomorrow,
+  });
+
+  final String? initialWhatShowedUp;
+  final String? initialWhatHelped;
+  final String? initialForTomorrow;
+
+  @override
+  State<_ReflectionEditorSheet> createState() => _ReflectionEditorSheetState();
+}
+
+class _ReflectionEditorSheetState extends State<_ReflectionEditorSheet> {
+  late final TextEditingController _whatShowedUpController = TextEditingController(
+    text: widget.initialWhatShowedUp,
+  );
+  late final TextEditingController _whatHelpedController = TextEditingController(
+    text: widget.initialWhatHelped,
+  );
+  late final TextEditingController _forTomorrowController = TextEditingController(
+    text: widget.initialForTomorrow,
+  );
+
+  @override
+  void dispose() {
+    _whatShowedUpController.dispose();
+    _whatHelpedController.dispose();
+    _forTomorrowController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final bottom = MediaQuery.of(context).viewInsets.bottom;
+    return SafeArea(
+      child: Padding(
+        padding: EdgeInsets.fromLTRB(12, 12, 12, bottom + 12),
+        child: Material(
+          color: Theme.of(context).scaffoldBackgroundColor,
+          borderRadius: BorderRadius.circular(28),
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Reflect on today', style: Theme.of(context).textTheme.titleLarge),
+                const SizedBox(height: 8),
+                Text(
+                  'A few sentences make the history and weekly insights much more useful later.',
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: _whatShowedUpController,
+                  maxLines: 2,
+                  decoration: const InputDecoration(labelText: 'What showed up most today?'),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: _whatHelpedController,
+                  maxLines: 2,
+                  decoration: const InputDecoration(labelText: 'What helped you reset?'),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: _forTomorrowController,
+                  maxLines: 2,
+                  decoration: const InputDecoration(labelText: 'What do you want tomorrow to feel like?'),
+                ),
+                const SizedBox(height: 18),
+                Row(
+                  children: [
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      child: const Text('Cancel'),
+                    ),
+                    const Spacer(),
+                    FilledButton(
+                      onPressed: () {
+                        Navigator.of(context).pop(
+                          _ReflectionDraft(
+                            whatShowedUp: _whatShowedUpController.text,
+                            whatHelped: _whatHelpedController.text,
+                            forTomorrow: _forTomorrowController.text,
+                          ),
+                        );
+                      },
+                      child: const Text('Save reflection'),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }

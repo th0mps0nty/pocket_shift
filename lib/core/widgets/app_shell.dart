@@ -29,6 +29,7 @@ class AppShell extends StatelessWidget {
               items: const [
                 BottomNavigationBarItem(icon: Icon(CupertinoIcons.money_dollar_circle), label: 'Today'),
                 BottomNavigationBarItem(icon: Icon(CupertinoIcons.time), label: 'History'),
+                BottomNavigationBarItem(icon: Icon(CupertinoIcons.chart_bar_alt_fill), label: 'Insights'),
                 BottomNavigationBarItem(icon: Icon(CupertinoIcons.settings), label: 'Settings'),
               ],
             )
@@ -51,6 +52,11 @@ class AppShell extends StatelessWidget {
                       icon: Icon(Icons.history_outlined),
                       selectedIcon: Icon(Icons.history),
                       label: 'History',
+                    ),
+                    NavigationDestination(
+                      icon: Icon(Icons.insights_outlined),
+                      selectedIcon: Icon(Icons.insights_rounded),
+                      label: 'Insights',
                     ),
                     NavigationDestination(
                       icon: Icon(Icons.tune_outlined),

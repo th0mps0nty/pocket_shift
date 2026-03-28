@@ -5,7 +5,12 @@ void main() {
   group('CoinMove', () {
     test('serializes and deserializes cleanly with a reason', () {
       final now = DateTime(2026, 3, 22, 9, 30);
-      final move = CoinMove(timestamp: now, direction: CoinDirection.leftToRight, reason: 'morning habit');
+      final move = CoinMove(
+        id: 'move-1',
+        timestamp: now,
+        direction: CoinDirection.leftToRight,
+        reason: 'morning habit',
+      );
 
       final roundTrip = CoinMove.fromJson(move.toJson());
 
@@ -16,7 +21,7 @@ void main() {
 
     test('serializes and deserializes cleanly without a reason', () {
       final now = DateTime(2026, 3, 22, 9, 30);
-      final move = CoinMove(timestamp: now, direction: CoinDirection.leftToRight);
+      final move = CoinMove(id: 'move-1', timestamp: now, direction: CoinDirection.leftToRight);
 
       final roundTrip = CoinMove.fromJson(move.toJson());
 
@@ -40,10 +45,11 @@ void main() {
 
     test('toJson includes all fields', () {
       final now = DateTime(2026, 3, 22, 9, 30);
-      final move = CoinMove(timestamp: now, direction: CoinDirection.leftToRight, reason: 'a reason');
+      final move = CoinMove(id: 'move-1', timestamp: now, direction: CoinDirection.leftToRight, reason: 'a reason');
 
       final json = move.toJson();
 
+      expect(json['id'], 'move-1');
       expect(json['timestamp'], isA<String>());
       expect(json['direction'], 'leftToRight');
       expect(json['reason'], 'a reason');

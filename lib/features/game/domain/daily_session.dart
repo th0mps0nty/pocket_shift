@@ -1,7 +1,9 @@
 import 'dart:math';
 
 import '../../../core/utils/date_utils.dart';
+import 'daily_reflection.dart';
 import 'coin_move.dart';
+import 'trigger_tag.dart';
 
 class DailySession {
   DailySession({
@@ -12,6 +14,7 @@ class DailySession {
     required this.createdAt,
     required this.updatedAt,
     this.endedAt,
+    this.reflection,
     List<CoinMove>? moves,
   }) : moves = List.unmodifiable(moves ?? const []);
 
@@ -22,11 +25,32 @@ class DailySession {
   final DateTime createdAt;
   final DateTime updatedAt;
   final DateTime? endedAt;
+  final DailyReflection? reflection;
   final List<CoinMove> moves;
 
   int get remainingCoins => max(0, startingCoins - movedCoins);
   bool get canMoveCoin => remainingCoins > 0;
   bool get canUndo => moves.isNotEmpty;
+  bool get hasReflection => reflection?.hasContent ?? false;
+  bool get hasCheckIn => movedCoins > 0 || hasReflection;
+
+  Map<TriggerTag, int> get triggerCounts {
+    final counts = <TriggerTag, int>{};
+    for (final move in moves) {
+      final tag = move.triggerTag;
+      if (tag == null) {
+        continue;
+      }
+      counts.update(tag, (value) => value + 1, ifAbsent: () => 1);
+    }
+    return counts;
+  }
+
+  TriggerTag? get topTrigger {
+    final counts = triggerCounts.entries.toList()
+      ..sort((a, b) => b.value.compareTo(a.value));
+    return counts.isEmpty ? null : counts.first.key;
+  }
 
   factory DailySession.fresh({
     required DateTime now,
@@ -51,6 +75,7 @@ class DailySession {
     DateTime? createdAt,
     DateTime? updatedAt,
     Object? endedAt = _sentinel,
+    Object? reflection = _sentinel,
     List<CoinMove>? moves,
   }) {
     return DailySession(
@@ -61,11 +86,17 @@ class DailySession {
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       endedAt: endedAt == _sentinel ? this.endedAt : endedAt as DateTime?,
+      reflection: reflection == _sentinel ? this.reflection : reflection as DailyReflection?,
       moves: moves ?? this.moves,
     );
   }
 
-  DailySession moveOne({required DateTime now, String? reason}) {
+  DailySession moveOne({
+    required DateTime now,
+    TriggerTag? triggerTag,
+    String? note,
+    String? reason,
+  }) {
     if (!canMoveCoin) {
       return this;
     }
@@ -73,9 +104,11 @@ class DailySession {
     final nextMoves = [
       ...moves,
       CoinMove(
+        id: 'move-$date-${now.microsecondsSinceEpoch}-${moves.length + 1}',
         timestamp: now,
         direction: CoinDirection.leftToRight,
-        reason: reason,
+        triggerTag: triggerTag,
+        note: note ?? reason,
       ),
     ];
 
@@ -84,6 +117,24 @@ class DailySession {
       updatedAt: now,
       moves: nextMoves,
     );
+  }
+
+  DailySession annotateLastMove({
+    required DateTime now,
+    TriggerTag? triggerTag,
+    String? note,
+  }) {
+    if (moves.isEmpty) {
+      return this;
+    }
+
+    final nextMoves = [...moves];
+    nextMoves[nextMoves.length - 1] = nextMoves.last.copyWith(
+      triggerTag: triggerTag,
+      note: _normalizeOptionalText(note),
+    );
+
+    return copyWith(updatedAt: now, moves: nextMoves);
   }
 
   DailySession? undoLastMove({required DateTime now}) {
@@ -102,6 +153,22 @@ class DailySession {
     return copyWith(updatedAt: now, endedAt: endedAt ?? now);
   }
 
+  DailySession saveReflection({
+    required DateTime now,
+    String? whatShowedUp,
+    String? whatHelped,
+    String? forTomorrow,
+  }) {
+    final nextReflection = DailyReflection(
+      whatShowedUp: _normalizeOptionalText(whatShowedUp),
+      whatHelped: _normalizeOptionalText(whatHelped),
+      forTomorrow: _normalizeOptionalText(forTomorrow),
+      completedAt: now,
+    );
+
+    return copyWith(updatedAt: now, reflection: nextReflection);
+  }
+
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -112,6 +179,7 @@ class DailySession {
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt.toIso8601String(),
       'endedAt': endedAt?.toIso8601String(),
+      'reflection': reflection?.toJson(),
       'moves': moves.map((move) => move.toJson()).toList(),
     };
   }
@@ -128,6 +196,9 @@ class DailySession {
       endedAt: json['endedAt'] == null
           ? null
           : DateTime.parse(json['endedAt'] as String),
+      reflection: json['reflection'] == null
+          ? null
+          : DailyReflection.fromJson(json['reflection'] as Map<String, dynamic>),
       moves: rawMoves
           .map((move) => CoinMove.fromJson(move as Map<String, dynamic>))
           .toList(),
@@ -136,3 +207,11 @@ class DailySession {
 }
 
 const Object _sentinel = Object();
+
+String? _normalizeOptionalText(String? value) {
+  final trimmed = value?.trim();
+  if (trimmed == null || trimmed.isEmpty) {
+    return null;
+  }
+  return trimmed;
+}

@@ -4,6 +4,7 @@ import 'package:pocket_shift/core/services/key_value_store.dart';
 import 'package:pocket_shift/core/services/notification_service.dart';
 import 'package:pocket_shift/core/utils/clock.dart';
 import 'package:pocket_shift/features/game/application/session_controller.dart';
+import 'package:pocket_shift/features/game/domain/trigger_tag.dart';
 import 'package:pocket_shift/features/settings/application/settings_controller.dart';
 import 'package:pocket_shift/features/settings/domain/app_settings.dart';
 
@@ -104,6 +105,42 @@ void main() {
 
     final session = await container.read(sessionControllerProvider.future);
     expect(session.movedCoins, 1);
+  });
+
+  test('annotateLastMove stores tag and note on the latest move', () async {
+    final container = _makeContainer();
+    addTearDown(container.dispose);
+
+    await container.read(sessionControllerProvider.future);
+    await container.read(sessionControllerProvider.notifier).moveCoin();
+
+    final result = await container.read(sessionControllerProvider.notifier).annotateLastMove(
+      triggerTag: TriggerTag.workStress,
+      note: 'A loaded inbox.',
+    );
+    final session = await container.read(sessionControllerProvider.future);
+
+    expect(result, isTrue);
+    expect(session.moves.single.triggerTag, TriggerTag.workStress);
+    expect(session.moves.single.note, 'A loaded inbox.');
+  });
+
+  test('saveReflection persists structured reflection content', () async {
+    final container = _makeContainer();
+    addTearDown(container.dispose);
+
+    await container.read(sessionControllerProvider.future);
+    await container.read(sessionControllerProvider.notifier).saveReflection(
+      whatShowedUp: 'I noticed I was more tense after lunch.',
+      whatHelped: 'I slowed down and took a breath.',
+      forTomorrow: 'Start meetings with less rush.',
+    );
+
+    final session = await container.read(sessionControllerProvider.future);
+
+    expect(session.hasReflection, isTrue);
+    expect(session.reflection?.whatShowedUp, 'I noticed I was more tense after lunch.');
+    expect(session.reflection?.whatHelped, 'I slowed down and took a breath.');
   });
 }
 

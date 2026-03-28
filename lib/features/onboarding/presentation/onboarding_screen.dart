@@ -31,9 +31,15 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       icon: Icons.visibility_outlined,
     ),
     _OnboardingPageData(
+      title: 'Tag the moment while it is still fresh.',
+      body:
+          'After a shift, you can quickly tag what triggered it and leave a short note. Those little pieces of context turn a coin move into something you can actually learn from.',
+      icon: Icons.label_outline_rounded,
+    ),
+    _OnboardingPageData(
       title: 'Fresh pockets tomorrow.',
       body:
-          'Your history stays local, gentle, and private. With gratitude to Brett Froggatt for sharing the original exercise that inspired this app.',
+          'Your history, reflections, and weekly insights stay local, gentle, and private. With gratitude to Brett Froggatt for sharing the original exercise that inspired this app.',
       icon: Icons.wb_sunny_outlined,
     ),
   ];
