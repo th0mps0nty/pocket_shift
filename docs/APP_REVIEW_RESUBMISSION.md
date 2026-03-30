@@ -20,6 +20,8 @@ For review:
 
 - Open `Today` to move a coin, tag the trigger, and add a note.
 - Open `History` and tap a past day to view the session detail timeline and saved reflection.
+- In `Session detail`, use `Edit reflection` to change an existing reflection or add one to that day.
+- Current-day reflections can also be edited from `Today` using the reflection card.
 - Open `Insights` to view the weekly summary, streak, trigger breakdown, and chart.
 - Support and privacy links are available in `Settings`.
 

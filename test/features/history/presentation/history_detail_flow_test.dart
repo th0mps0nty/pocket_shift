@@ -16,7 +16,7 @@ import 'package:pocket_shift/features/settings/domain/app_settings.dart';
 import '../../../helpers/in_memory_key_value_store.dart';
 
 void main() {
-  testWidgets('history card opens session detail with moves and reflection', (tester) async {
+  testWidgets('history card opens session detail and allows editing reflection', (tester) async {
     tester.view.physicalSize = const Size(1280, 2200);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.resetPhysicalSize);
@@ -97,6 +97,18 @@ void main() {
     expect(find.text('Move timeline'), findsOneWidget);
     expect(find.text('Complaining'), findsOneWidget);
     expect(find.text('I was short with people.'), findsOneWidget);
+
+    await tester.tap(find.widgetWithText(OutlinedButton, 'Edit reflection'));
+    await tester.pumpAndSettle();
+
+    await tester.enterText(
+      find.widgetWithText(TextField, 'What showed up most today?'),
+      'I caught the tone earlier the second time.',
+    );
+    await tester.tap(find.widgetWithText(FilledButton, 'Save reflection'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('I caught the tone earlier the second time.'), findsOneWidget);
   });
 }
 
