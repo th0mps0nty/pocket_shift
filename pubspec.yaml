@@ -1,8 +1,7 @@
 name: pocket_shift
 description: Pocket Shift is a gentle micro-habit tracker for noticing small shifts.
 publish_to: 'none'
-version: 1.0.0+2
-
+version: 1.0.0+3
 environment:
   sdk: ^3.11.0
 
