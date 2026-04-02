@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/constants/app_constants.dart';
 import '../../../core/services/sound_effects_service.dart';
@@ -27,7 +28,8 @@ class GameScreen extends ConsumerStatefulWidget {
   ConsumerState<GameScreen> createState() => _GameScreenState();
 }
 
-class _GameScreenState extends ConsumerState<GameScreen> with WidgetsBindingObserver {
+class _GameScreenState extends ConsumerState<GameScreen>
+    with WidgetsBindingObserver {
   int _animationTrigger = 0;
 
   @override
@@ -53,7 +55,8 @@ class _GameScreenState extends ConsumerState<GameScreen> with WidgetsBindingObse
   Widget build(BuildContext context) {
     final sessionAsync = ref.watch(sessionControllerProvider);
     final settings = ref.watch(settingsControllerProvider).valueOrNull;
-    final reducedMotion = MediaQuery.maybeOf(context)?.disableAnimations ?? false;
+    final reducedMotion =
+        MediaQuery.maybeOf(context)?.disableAnimations ?? false;
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -119,7 +122,9 @@ class _GameScreenState extends ConsumerState<GameScreen> with WidgetsBindingObse
         ref
             .read(soundEffectsServiceProvider)
             .playCoinLanding(
-              delay: reducedMotion ? const Duration(milliseconds: 80) : const Duration(milliseconds: 340),
+              delay: reducedMotion
+                  ? const Duration(milliseconds: 80)
+                  : const Duration(milliseconds: 340),
             ),
       );
     }
@@ -139,7 +144,9 @@ class _GameScreenState extends ConsumerState<GameScreen> with WidgetsBindingObse
 
   Future<void> _undoMove() async {
     final settings = ref.read(settingsControllerProvider).valueOrNull;
-    final undone = await ref.read(sessionControllerProvider.notifier).undoLastMove();
+    final undone = await ref
+        .read(sessionControllerProvider.notifier)
+        .undoLastMove();
     if (!mounted || !undone) {
       return;
     }
@@ -173,10 +180,9 @@ class _GameScreenState extends ConsumerState<GameScreen> with WidgetsBindingObse
       return;
     }
 
-    await ref.read(sessionControllerProvider.notifier).annotateLastMove(
-      triggerTag: result.triggerTag,
-      note: result.note,
-    );
+    await ref
+        .read(sessionControllerProvider.notifier)
+        .annotateLastMove(triggerTag: result.triggerTag, note: result.note);
   }
 
   Future<void> _openReflectionEditor() async {
@@ -200,11 +206,13 @@ class _GameScreenState extends ConsumerState<GameScreen> with WidgetsBindingObse
       return;
     }
 
-    await ref.read(sessionControllerProvider.notifier).saveReflection(
-      whatShowedUp: result.whatShowedUp,
-      whatHelped: result.whatHelped,
-      forTomorrow: result.forTomorrow,
-    );
+    await ref
+        .read(sessionControllerProvider.notifier)
+        .saveReflection(
+          whatShowedUp: result.whatShowedUp,
+          whatHelped: result.whatHelped,
+          forTomorrow: result.forTomorrow,
+        );
   }
 }
 
@@ -231,8 +239,14 @@ class _Header extends StatelessWidget {
           spacing: 10,
           runSpacing: 10,
           children: [
-            _Pill(icon: Icons.today_rounded, label: 'Today: ${session.startingCoins} coins'),
-            _Pill(icon: Icons.spa_outlined, label: '${session.remainingCoins} still in the left pocket'),
+            _Pill(
+              icon: Icons.today_rounded,
+              label: 'Today: ${session.startingCoins} coins',
+            ),
+            _Pill(
+              icon: Icons.spa_outlined,
+              label: '${session.remainingCoins} still in the left pocket',
+            ),
           ],
         ),
       ],
@@ -248,12 +262,18 @@ class _PurposeCard extends StatelessWidget {
     return SectionCard(
       child: LayoutBuilder(
         builder: (context, constraints) {
-          final stacked = constraints.maxWidth < 430 || MediaQuery.textScalerOf(context).scale(1) > 1.15;
+          final stacked =
+              constraints.maxWidth < 430 ||
+              MediaQuery.textScalerOf(context).scale(1) > 1.15;
 
           if (stacked) {
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [_PurposeIcon(), SizedBox(height: 14), _PurposeCopy()],
+              children: const [
+                _PurposeIcon(),
+                SizedBox(height: 14),
+                _PurposeCopy(),
+              ],
             );
           }
 
@@ -289,14 +309,19 @@ class _WebPromoCard extends StatelessWidget {
             crossAxisAlignment: WrapCrossAlignment.center,
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
                 decoration: BoxDecoration(
                   color: context.ps.accentSurface,
                   borderRadius: BorderRadius.circular(999),
                 ),
                 child: Text(
                   AppConstants.iosStoreAvailabilityLabel,
-                  style: theme.textTheme.labelLarge,
+                  style: theme.textTheme.labelLarge?.copyWith(
+                    color: theme.colorScheme.onSurface,
+                  ),
                 ),
               ),
               Text(
@@ -307,11 +332,20 @@ class _WebPromoCard extends StatelessWidget {
           ),
           const SizedBox(height: 14),
           Text(
-            'Prefer the native mobile experience? Pocket Shift is coming soon to iPhone and Android, while this web version stays free.',
+            hasStoreUrl
+                ? 'Prefer the native mobile experience? Pocket Shift is now live on the App Store, and Android is coming soon while this web version stays free.'
+                : 'Prefer the native mobile experience? Pocket Shift is coming soon to iPhone and Android, while this web version stays free.',
             style: theme.textTheme.bodyLarge,
           ),
-          if (!hasStoreUrl) ...[
-            const SizedBox(height: 10),
+          const SizedBox(height: 10),
+          if (hasStoreUrl)
+            OutlinedButton.icon(
+              onPressed: () =>
+                  _openExternal(context, AppConstants.iosAppStoreUrl),
+              icon: const Icon(Icons.open_in_new_rounded),
+              label: const Text('Open on the App Store'),
+            )
+          else ...[
             Text(
               'The direct App Store link will be added here once the listing is live.',
               style: theme.textTheme.bodyMedium,
@@ -320,6 +354,18 @@ class _WebPromoCard extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  Future<void> _openExternal(BuildContext context, String url) async {
+    final uri = Uri.parse(url);
+    final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
+    if (launched || !context.mounted) {
+      return;
+    }
+
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text('Could not open $url right now.')));
   }
 }
 
@@ -331,7 +377,10 @@ class _PurposeIcon extends StatelessWidget {
     return Container(
       width: 52,
       height: 52,
-      decoration: BoxDecoration(color: context.ps.accentSurface, shape: BoxShape.circle),
+      decoration: BoxDecoration(
+        color: context.ps.accentSurface,
+        shape: BoxShape.circle,
+      ),
       child: const Icon(Icons.lightbulb_outline_rounded),
     );
   }
@@ -357,23 +406,25 @@ class _PurposeCopy extends StatelessWidget {
 }
 
 class _AwarenessCard extends StatelessWidget {
-  const _AwarenessCard({
-    required this.session,
-    required this.onOpenReflection,
-  });
+  const _AwarenessCard({required this.session, required this.onOpenReflection});
 
   final DailySession session;
   final Future<void> Function() onOpenReflection;
 
   @override
   Widget build(BuildContext context) {
-    final taggedMoves = session.moves.where((move) => move.triggerTag != null).length;
+    final taggedMoves = session.moves
+        .where((move) => move.triggerTag != null)
+        .length;
 
     return SectionCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Today’s awareness', style: Theme.of(context).textTheme.titleLarge),
+          Text(
+            'Today’s awareness',
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
           const SizedBox(height: 8),
           Text(
             session.movedCoins == 0
@@ -386,10 +437,15 @@ class _AwarenessCard extends StatelessWidget {
             spacing: 12,
             runSpacing: 12,
             children: [
-              _Pill(icon: Icons.label_outline_rounded, label: '$taggedMoves tagged shifts'),
+              _Pill(
+                icon: Icons.label_outline_rounded,
+                label: '$taggedMoves tagged shifts',
+              ),
               _Pill(
                 icon: Icons.insights_outlined,
-                label: session.topTrigger == null ? 'No top trigger yet' : 'Top trigger: ${session.topTrigger!.label}',
+                label: session.topTrigger == null
+                    ? 'No top trigger yet'
+                    : 'Top trigger: ${session.topTrigger!.label}',
               ),
             ],
           ),
@@ -405,16 +461,18 @@ class _AwarenessCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  session.hasReflection ? 'Today’s reflection' : 'End-of-day reflection',
+                  session.hasReflection
+                      ? 'Today’s reflection'
+                      : 'End-of-day reflection',
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
                 const SizedBox(height: 8),
                 Text(
                   session.hasReflection
                       ? session.reflection?.whatShowedUp ??
-                          session.reflection?.whatHelped ??
-                          session.reflection?.forTomorrow ??
-                          'Reflection saved.'
+                            session.reflection?.whatHelped ??
+                            session.reflection?.forTomorrow ??
+                            'Reflection saved.'
                       : 'Capture what showed up, what helped, and what you want tomorrow to feel like.',
                   style: Theme.of(context).textTheme.bodyMedium,
                 ),
@@ -424,7 +482,11 @@ class _AwarenessCard extends StatelessWidget {
                     unawaited(onOpenReflection());
                   },
                   icon: const Icon(Icons.auto_stories_outlined),
-                  label: Text(session.hasReflection ? 'Edit reflection' : 'Add reflection'),
+                  label: Text(
+                    session.hasReflection
+                        ? 'Edit reflection'
+                        : 'Add reflection',
+                  ),
                 ),
               ],
             ),
@@ -463,7 +525,9 @@ class _PocketBoard extends StatelessWidget {
       child: LayoutBuilder(
         builder: (context, constraints) {
           final vertical = constraints.maxWidth < 640 || textScale > 1.18;
-          final layout = vertical ? PocketBoardLayout.vertical : PocketBoardLayout.horizontal;
+          final layout = vertical
+              ? PocketBoardLayout.vertical
+              : PocketBoardLayout.horizontal;
           final pocketSpacing = vertical ? 12.0 : 14.0;
 
           return Container(
@@ -472,11 +536,23 @@ class _PocketBoard extends StatelessWidget {
               gradient: const LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                colors: [Color(0xFF294A70), Color(0xFF1C3550), Color(0xFF13263C)],
+                colors: [
+                  Color(0xFF294A70),
+                  Color(0xFF1C3550),
+                  Color(0xFF13263C),
+                ],
               ),
               borderRadius: BorderRadius.circular(32),
-              border: Border.all(color: const Color(0xFF89A9C7).withValues(alpha: 0.24)),
-              boxShadow: const [BoxShadow(blurRadius: 28, offset: Offset(0, 16), color: Color(0x24152A42))],
+              border: Border.all(
+                color: const Color(0xFF89A9C7).withValues(alpha: 0.24),
+              ),
+              boxShadow: const [
+                BoxShadow(
+                  blurRadius: 28,
+                  offset: Offset(0, 16),
+                  color: Color(0x24152A42),
+                ),
+              ],
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -484,9 +560,10 @@ class _PocketBoard extends StatelessWidget {
                 Center(
                   child: Text(
                     'Today\'s jeans',
-                    style: Theme.of(
-                      context,
-                    ).textTheme.titleLarge?.copyWith(color: Colors.white, fontWeight: FontWeight.w800),
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w800,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 14),
@@ -571,9 +648,10 @@ class _PocketBoard extends StatelessWidget {
                         children: [
                           Text(
                             statusMessage,
-                            style: Theme.of(
-                              context,
-                            ).textTheme.bodyLarge?.copyWith(color: Colors.white.withValues(alpha: 0.92)),
+                            style: Theme.of(context).textTheme.bodyLarge
+                                ?.copyWith(
+                                  color: Colors.white.withValues(alpha: 0.92),
+                                ),
                           ),
                           const SizedBox(height: 10),
                           OutlinedButton.icon(
@@ -584,7 +662,9 @@ class _PocketBoard extends StatelessWidget {
                                 : null,
                             style: OutlinedButton.styleFrom(
                               foregroundColor: Colors.white,
-                              side: BorderSide(color: Colors.white.withValues(alpha: 0.22)),
+                              side: BorderSide(
+                                color: Colors.white.withValues(alpha: 0.22),
+                              ),
                             ),
                             icon: const Icon(Icons.undo_rounded),
                             label: const Text('Undo last'),
@@ -596,9 +676,10 @@ class _PocketBoard extends StatelessWidget {
                           Expanded(
                             child: Text(
                               statusMessage,
-                              style: Theme.of(
-                                context,
-                              ).textTheme.bodyLarge?.copyWith(color: Colors.white.withValues(alpha: 0.92)),
+                              style: Theme.of(context).textTheme.bodyLarge
+                                  ?.copyWith(
+                                    color: Colors.white.withValues(alpha: 0.92),
+                                  ),
                             ),
                           ),
                           const SizedBox(width: 12),
@@ -610,7 +691,9 @@ class _PocketBoard extends StatelessWidget {
                                 : null,
                             style: OutlinedButton.styleFrom(
                               foregroundColor: Colors.white,
-                              side: BorderSide(color: Colors.white.withValues(alpha: 0.22)),
+                              side: BorderSide(
+                                color: Colors.white.withValues(alpha: 0.22),
+                              ),
                             ),
                             icon: const Icon(Icons.undo_rounded),
                             label: const Text('Undo last'),
@@ -635,7 +718,10 @@ class _ContextCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('A little context helps', style: Theme.of(context).textTheme.titleLarge),
+          Text(
+            'A little context helps',
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
           const SizedBox(height: 8),
           Text(
             'This ritual came from counseling as a way to raise awareness around negative patterns before they shape the atmosphere of the day. Pocket Shift keeps that practice light and private so a tiny pause can become a meaningful shift.',
@@ -686,7 +772,10 @@ class _MoveCaptureSheetState extends State<_MoveCaptureSheet> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('What triggered that shift?', style: Theme.of(context).textTheme.titleLarge),
+                Text(
+                  'What triggered that shift?',
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
                 const SizedBox(height: 8),
                 Text(
                   'Add a little context while the moment is still fresh. You can skip this if you just want the move recorded.',
@@ -777,15 +866,12 @@ class _ReflectionEditorSheet extends StatefulWidget {
 }
 
 class _ReflectionEditorSheetState extends State<_ReflectionEditorSheet> {
-  late final TextEditingController _whatShowedUpController = TextEditingController(
-    text: widget.initialWhatShowedUp,
-  );
-  late final TextEditingController _whatHelpedController = TextEditingController(
-    text: widget.initialWhatHelped,
-  );
-  late final TextEditingController _forTomorrowController = TextEditingController(
-    text: widget.initialForTomorrow,
-  );
+  late final TextEditingController _whatShowedUpController =
+      TextEditingController(text: widget.initialWhatShowedUp);
+  late final TextEditingController _whatHelpedController =
+      TextEditingController(text: widget.initialWhatHelped);
+  late final TextEditingController _forTomorrowController =
+      TextEditingController(text: widget.initialForTomorrow);
 
   @override
   void dispose() {
@@ -810,7 +896,10 @@ class _ReflectionEditorSheetState extends State<_ReflectionEditorSheet> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Reflect on today', style: Theme.of(context).textTheme.titleLarge),
+                Text(
+                  'Reflect on today',
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
                 const SizedBox(height: 8),
                 Text(
                   'A few sentences make the history and weekly insights much more useful later.',
@@ -820,19 +909,25 @@ class _ReflectionEditorSheetState extends State<_ReflectionEditorSheet> {
                 TextField(
                   controller: _whatShowedUpController,
                   maxLines: 2,
-                  decoration: const InputDecoration(labelText: 'What showed up most today?'),
+                  decoration: const InputDecoration(
+                    labelText: 'What showed up most today?',
+                  ),
                 ),
                 const SizedBox(height: 12),
                 TextField(
                   controller: _whatHelpedController,
                   maxLines: 2,
-                  decoration: const InputDecoration(labelText: 'What helped you reset?'),
+                  decoration: const InputDecoration(
+                    labelText: 'What helped you reset?',
+                  ),
                 ),
                 const SizedBox(height: 12),
                 TextField(
                   controller: _forTomorrowController,
                   maxLines: 2,
-                  decoration: const InputDecoration(labelText: 'What do you want tomorrow to feel like?'),
+                  decoration: const InputDecoration(
+                    labelText: 'What do you want tomorrow to feel like?',
+                  ),
                 ),
                 const SizedBox(height: 18),
                 Row(
@@ -877,14 +972,22 @@ class _Pill extends StatelessWidget {
       container: true,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-        decoration: BoxDecoration(color: context.ps.chipSurface, borderRadius: BorderRadius.circular(999)),
+        decoration: BoxDecoration(
+          color: context.ps.chipSurface,
+          borderRadius: BorderRadius.circular(999),
+        ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(icon, size: 22),
             const SizedBox(width: 10),
             Flexible(
-              child: Text(label, style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w700)),
+              child: Text(
+                label,
+                style: Theme.of(
+                  context,
+                ).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w700),
+              ),
             ),
           ],
         ),
@@ -905,7 +1008,10 @@ class _ErrorState extends ConsumerWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('Today\'s pockets need a quick refresh.', style: Theme.of(context).textTheme.titleLarge),
+            Text(
+              'Today\'s pockets need a quick refresh.',
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
             const SizedBox(height: 12),
             Text(
               'We could not load your current session, but your local data is still here. Try again and we will pick it back up.',

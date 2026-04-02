@@ -2,8 +2,10 @@ class AppConstants {
   const AppConstants._();
 
   static const String iosPriceLabel = 'Website stays free';
-  static const String iosStoreAvailabilityLabel = 'Coming soon on iPhone and Android';
-  static const String iosAppStoreUrl = '';
+  static const String iosStoreAvailabilityLabel =
+      'Now on the App Store, coming soon to Android';
+  static const String iosAppStoreUrl =
+      'https://apps.apple.com/us/app/pocketshift/id6761237770';
   static const String supportUrl = 'https://pocketshift.app/support/';
   static const String privacyUrl = 'https://pocketshift.app/privacy/';
 
